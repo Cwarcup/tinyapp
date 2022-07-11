@@ -15,11 +15,17 @@ app.get('/', (req, res) => {
 });
 
 // route to render "/urls" page
-app.get('/urls', (req, res) => {
+app.get('/urls/:id', (req, res) => {
   // data to pass to the ejs file
   let templateVars = {
-    urls: urlDatabase
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id]
   };
+  res.render('urls_show', templateVars);
+});
+
+app.get('/urls', (req, res) => {
+  const templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
 });
 
