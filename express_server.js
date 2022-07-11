@@ -14,28 +14,19 @@ app.get('/', (req, res) => {
   res.send('Hello!');
 });
 
+// route to render "/urls" page
+app.get('/urls', (req, res) => {
+  // data to pass to the ejs file
+  let templateVars = {
+    urls: urlDatabase
+  };
+  res.render('urls_index', templateVars);
+});
+
 // sending json data
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
-
-// sending HTML
-app.get('/hello', (req, res) => {
-  res.send('<html><body>Hello <b>World</b></body></html>\n');
-});
-
-// variable created in the function
-app.get('/set', (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
-});
-
-// trying to access the variable created in the function
-app.get('/fetch', (req, res) => {
-  res.send(`a = ${a}`);
-});
-// results in an error 'a is not defined'
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
