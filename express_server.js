@@ -56,8 +56,13 @@ app.get('/', (req, res) => {
 
 // POST method to receive the form data from urls_new
 app.post('/urls', (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send('Ok'); // Respond with 'Ok' (we will replace this)
+  console.log(req.body); //log request body
+  const shortURL = generateRandomString();
+  // add new shortURL to urlDatabase
+  urlDatabase[shortURL] = req.body.longURL;
+  // redirect to new shortURL page
+  // gets sent to the GET '/urls/:id'
+  res.redirect(`/urls/${shortURL}`);
 });
 
 
