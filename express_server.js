@@ -5,6 +5,8 @@ const PORT = 8080; // default port 8080
 
 // add in EJS middlware
 app.set('view engine', 'ejs');
+
+// use middwares
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 
@@ -13,6 +15,7 @@ const urlDatabase = {
   '9sm5xK': 'http://www.google.com'
 };
 
+// generate random string
 const generateRandomString = () => {
   const randomString = Math.random().toString(36).substring(7);
   return randomString;
@@ -44,16 +47,21 @@ app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
+// home page route
 app.get('/', (req, res) => {
-  res.send('Hello!');
+  res.send('Welcome to TinyURL!');
 });
 
-/// post methods
+///////////////// post methods ///////////////
+
+// POST method to receive the form data from urls_new
 app.post('/urls', (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   res.send('Ok'); // Respond with 'Ok' (we will replace this)
 });
 
+
+// setup the server
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
