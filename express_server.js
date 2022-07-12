@@ -51,13 +51,12 @@ app.get('/urls/:id', (req, res) => {
 
 // route to render "/urls" page
 app.get('/urls', (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  // data to pass to the ejs file
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies['username']
+  };
   res.render('urls_index', templateVars);
-});
-
-// sending json data
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase);
 });
 
 // home page route
