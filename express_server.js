@@ -32,8 +32,8 @@ const users = {
   },
 };
 
-// 1. register
-// 2. create new object in the users object
+// 1. register - route working
+// 2. create new object in the users object - post request
 // "login" - checks the users object for a matching email
 // if matches -> great -> create cookie, redirect home
 // if not, redirect to register page
@@ -87,15 +87,17 @@ app.get('/urls/:id', (req, res) => {
 
 // route to render "/urls" page
 app.get('/urls', (req, res) => {
-  // data to pass to the ejs file
-  const user = users[req.cookies.user_id];
-  console.log(req.cookies);
   const templateVars = {
     urls: urlDatabase,
-    email: 'curtis@gmail.com'//user.email,
   };
-  console.log(users);
-  res.render('urls_index', templateVars);
+
+  if (users[req.cookies.user_id]) {
+    templateVars.email = users[req.cookies.user_id].email;
+    res.render('urls_index', templateVars);
+  } else {
+    templateVars.email = undefined;
+    res.render('urls_index', templateVars);
+  }
 });
 
 // home page route
@@ -127,16 +129,25 @@ app.post('/register', (req, res) => {
 
 // post method to /login
 app.post('/login', (req, res) => {
-  // set cookie name to 'username', value to req.body.username from form
-  // const email = req.body.
-  res.cookie('username', req.body.username);
-  res.redirect('/urls');
+  // get the email from login form
+  const email = users[req.body.email];
+  // iterate through users database to see if email matches
+  for (let user in users) {
+    if (users[user].email === req.body.email) {
+      // if email matches, set cookie for user
+      res.cookie('user_id', users[user].id);
+      console.log('users database: ', users);
+      res.redirect('/urls');
+    }
+  }
+  // if email doesn't match, redirect to register page
+  console.log('users database: NO MATCH', users);
+
+  res.redirect('/register');
 });
 
 // logout endpoint
 app.post('/logout', (req, res) => {
-  // get username from the cookie
-  const username = req.cookies.username;
   // remove the cookie using the cookie name
   res.clearCookie('user_id');
   res.redirect('/urls');
