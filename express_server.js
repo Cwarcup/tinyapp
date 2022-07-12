@@ -26,7 +26,7 @@ app.get('/u/:id',(req, res) => {
   // check if long URL exists
   const longURL = urlDatabase[req.params.id];
   if (longURL) {
-    res.redirect(`/urls/${req.params.id}`);
+    res.redirect(longURL);
   } else {
     res.status(404).redirect('https://http.cat/404');
   }
@@ -82,6 +82,15 @@ app.post('/urls/:id/delete', (req, res) => {
   console.log(`${req.params.id} has been deleted`);
   // redirect to urls_index page
   res.redirect('/urls');
+});
+
+// POST method to handle updates to long URL
+app.post('/urls/:id/update', (req, res) => {
+  // update longURL in urlDatabase
+  urlDatabase[req.params.id] = req.body.longURL;
+  // redirect to urls_index page
+  res.redirect(`/urls/${req.params.id}`);
+
 });
 
 
