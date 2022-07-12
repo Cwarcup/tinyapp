@@ -24,6 +24,15 @@ const generateRandomString = () => {
 };
 
 //////////   GET ROUTES   //////////
+// GET for /register
+app.get('/register', (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies['username']
+  };
+  res.render('register', templateVars);
+});
+
 // redirect user to long URL if it exists
 app.get('/u/:id',(req, res) => {
   // check if long URL exists
@@ -66,6 +75,12 @@ app.get('/', (req, res) => {
 });
 
 ///////////////// POST routes ///////////////
+
+// POST route for /register
+app.post('/register', (req, res) => {
+  console.log(req.body);
+  res.redirect('/register');
+});
 
 // post method to /login
 app.post('/login', (req, res) => {
