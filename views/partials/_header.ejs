@@ -16,15 +16,16 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+        <a class="nav-item nav-link" href="/register">Register</a>
       </div>
       <div class="ml-auto">
-        <% if (username) { %>
+        <% if (email !== undefined ) { %>
           <form class="form-inline" action="/logout" method="POST">
             <div class="form-group mb-2">
               <label for="loggedInUsername" class="m-2">
-                Logged in as: <%= username %>
+                Logged in as: <%= email %>
               </label>
-              <input type="hidden" value="<%= username %>">
+              <input type="hidden" value="<%= email %>">
               <button name="logout" type="submit" class="btn btn-outline-dark">Logout</button>
             </div>
           </form>

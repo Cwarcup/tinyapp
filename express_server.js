@@ -32,6 +32,12 @@ const users = {
   },
 };
 
+// 1. register
+// 2. create new object in the users object
+// "login" - checks the users object for a matching email
+// if matches -> great -> create cookie, redirect home
+// if not, redirect to register page
+
 // generate random string
 const generateRandomString = () => {
   const randomString = Math.random().toString(36).substring(7);
@@ -43,9 +49,14 @@ const generateRandomString = () => {
 app.get('/register', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies['username']
   };
-  res.render('register', templateVars);
+
+  if (users[req.cookies.user_id]) {
+    templateVars.email = users[req.cookies.user_id].email;
+  } else {
+    templateVars.email = undefined;
+    res.render('register', templateVars);
+  }
 });
 
 // redirect user to long URL if it exists
@@ -77,10 +88,13 @@ app.get('/urls/:id', (req, res) => {
 // route to render "/urls" page
 app.get('/urls', (req, res) => {
   // data to pass to the ejs file
+  const user = users[req.cookies.user_id];
+  console.log(req.cookies);
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies['username']
+    email: 'curtis@gmail.com'//user.email,
   };
+  console.log(users);
   res.render('urls_index', templateVars);
 });
 
@@ -99,14 +113,22 @@ app.post('/register', (req, res) => {
     email: req.body.email,
     password: req.body.password
   };
+  // add newUser to users database
   users[newUser.id] = newUser;
-  console.log('users: ', users);
-  res.redirect('/register');
+
+  // console.log('users database: ', users); // works!
+  // console.log("new user's id: ", newUser.id); //works!
+
+  // set cookie for new user
+  res.cookie('user_id', newUser.id);
+
+  res.redirect('/urls');
 });
 
 // post method to /login
 app.post('/login', (req, res) => {
   // set cookie name to 'username', value to req.body.username from form
+  // const email = req.body.
   res.cookie('username', req.body.username);
   res.redirect('/urls');
 });
@@ -116,7 +138,7 @@ app.post('/logout', (req, res) => {
   // get username from the cookie
   const username = req.cookies.username;
   // remove the cookie using the cookie name
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
