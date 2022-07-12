@@ -65,6 +65,12 @@ app.get('/', (req, res) => {
 
 ///////////////// post methods ///////////////
 
+// post method to /login
+app.post('login', (rec, res) => {
+  // get back the form data
+  const username = rec.body.username;
+});
+
 // POST method to receive the form data from urls_new
 app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
@@ -91,7 +97,6 @@ app.post('/urls/:id/update', (req, res) => {
   urlDatabase[req.params.id] = req.body.longURL;
   // redirect to urls_index page
   res.redirect(`/urls/${req.params.id}`);
-
 });
 
 
