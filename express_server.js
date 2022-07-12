@@ -60,7 +60,7 @@ app.get('/urls.json', (req, res) => {
 
 // home page route
 app.get('/', (req, res) => {
-  res.send('Welcome to TinyURL!');
+  res.redirect('/urls');
 });
 
 ///////////////// post methods ///////////////
