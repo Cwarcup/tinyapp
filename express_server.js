@@ -23,6 +23,7 @@ const generateRandomString = () => {
   return randomString;
 };
 
+//////////   GET ROUTES   //////////
 // redirect user to long URL if it exists
 app.get('/u/:id',(req, res) => {
   // check if long URL exists
@@ -64,7 +65,7 @@ app.get('/', (req, res) => {
   res.redirect('/urls');
 });
 
-///////////////// post methods ///////////////
+///////////////// POST routes ///////////////
 
 // post method to /login
 app.post('/login', (req, res) => {
@@ -95,7 +96,6 @@ app.post('/urls', (req, res) => {
 // POST method to handle deleted URLs
 app.post('/urls/:id/delete', (req, res) => {
   // delete shortURL from urlDatabase
-  console.log(req.body);
   delete urlDatabase[req.params.id];
   console.log(`${req.params.id} has been deleted`);
   // redirect to urls_index page
@@ -111,7 +111,7 @@ app.post('/urls/:id/update', (req, res) => {
 });
 
 
-// setup the server
+///////////// setup the server //////////////
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
