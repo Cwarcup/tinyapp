@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const app = express();
 const PORT = 8080; // default port 8080
+const cookieParser = require('cookie-parser');
 
 // add in EJS middlware
 app.set('view engine', 'ejs');
@@ -9,6 +10,7 @@ app.set('view engine', 'ejs');
 // use middwares
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
@@ -66,9 +68,11 @@ app.get('/', (req, res) => {
 ///////////////// post methods ///////////////
 
 // post method to /login
-app.post('login', (rec, res) => {
-  // get back the form data
-  const username = rec.body.username;
+app.post('/login', (req, res) => {
+  // set cookie name to 'username', value to req.body.username from form
+  res.cookie('username', req.body.username);
+  res.redirect('/urls');
+
 });
 
 // POST method to receive the form data from urls_new
