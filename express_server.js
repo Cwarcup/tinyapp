@@ -26,7 +26,7 @@ app.get('/u/:id',(req, res) => {
   // check if long URL exists
   const longURL = urlDatabase[req.params.id];
   if (longURL) {
-    res.redirect(longURL);
+    res.redirect(`/urls/${req.params.id}`);
   } else {
     res.status(404).redirect('https://http.cat/404');
   }
