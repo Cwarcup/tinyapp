@@ -78,6 +78,7 @@ app.post('/urls', (req, res) => {
 // POST method to handle deleted URLs
 app.post('/urls/:id/delete', (req, res) => {
   // delete shortURL from urlDatabase
+  console.log(req.body);
   delete urlDatabase[req.params.id];
   console.log(`${req.params.id} has been deleted`);
   // redirect to urls_index page
