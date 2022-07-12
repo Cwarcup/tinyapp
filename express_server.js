@@ -71,7 +71,15 @@ app.post('/login', (req, res) => {
   // set cookie name to 'username', value to req.body.username from form
   res.cookie('username', req.body.username);
   res.redirect('/urls');
+});
 
+// logout endpoint
+app.post('/logout', (req, res) => {
+  // get username from the cookie
+  const username = req.cookies.username;
+  // remove the cookie using the cookie name
+  res.clearCookie('username');
+  res.redirect('/urls');
 });
 
 // POST method to receive the form data from urls_new
