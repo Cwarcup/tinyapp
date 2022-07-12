@@ -21,6 +21,17 @@ const generateRandomString = () => {
   return randomString;
 };
 
+// redirect user to long URL if it exists
+app.get('/u/:id',(req, res) => {
+  // check if long URL exists
+  const longURL = urlDatabase[req.params.id];
+  if (longURL) {
+    res.redirect(longURL);
+  } else {
+    res.status(404).redirect('https://http.cat/404');
+  }
+});
+
 // route to create a new short URL
 app.get('/urls/new', (req, res) => {
   res.render('urls_new');
@@ -56,13 +67,12 @@ app.get('/', (req, res) => {
 
 // POST method to receive the form data from urls_new
 app.post('/urls', (req, res) => {
-  console.log(req.body); //log request body
   const shortURL = generateRandomString();
   // add new shortURL to urlDatabase
   urlDatabase[shortURL] = req.body.longURL;
   // redirect to new shortURL page
   // gets sent to the GET '/urls/:id'
-  res.redirect(`/urls/${shortURL}`);
+  res.redirect(`/u/${shortURL}`);
 });
 
 
