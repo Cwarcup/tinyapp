@@ -12,9 +12,24 @@ app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// URL database
 const urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
   '9sm5xK': 'http://www.google.com'
+};
+
+// user database
+const users = {
+  userRandomID: {
+    id: 'userRandomID',
+    email: 'user@example.com',
+    password: 'purple-monkey-dinosaur',
+  },
+  user2RandomID: {
+    id: 'user2RandomID',
+    email: 'user2@example.com',
+    password: 'dishwasher-funk',
+  },
 };
 
 // generate random string
@@ -78,7 +93,14 @@ app.get('/', (req, res) => {
 
 // POST route for /register
 app.post('/register', (req, res) => {
-  console.log(req.body);
+  // create new user object (userId, email, password)
+  const newUser = {
+    id: generateRandomString(),
+    email: req.body.email,
+    password: req.body.password
+  };
+  users[newUser.id] = newUser;
+  console.log('users: ', users);
   res.redirect('/register');
 });
 
