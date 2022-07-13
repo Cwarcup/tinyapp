@@ -254,11 +254,15 @@ app.post('/login', (req, res) => {
     // send user to /urls
     return res.redirect('/urls');
   }
+  const templateVars = {
+    message: 'Email or password is incorrect.',
+    email: undefined,
+    
+
+  };
   // if user with email can not be found, respond with 403
-  if (!userLookup(req.body.email, req.body.password)) {
-    console.log(`email ${req.body.email} NOT found`);
-    return res.status(403).redirect('/login');
-  }
+  console.log(`email ${req.body.email} NOT found`);
+  return res.status(403).render('login', templateVars);
 });
 
 // LOGOUT POST route
