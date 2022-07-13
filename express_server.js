@@ -31,6 +31,11 @@ const users = {
     email: 'user2@example.com',
     password: 'dishwasher-funk',
   },
+  cw: {
+    id: 'cw',
+    email: 'cw@email.com',
+    password: 'cw',
+  }
 };
 //////////// helper functions //////////////
 // generate random string
@@ -51,19 +56,27 @@ const userLookup = (email, password) => {
   return null;
 };
 
+// check if browser has cookie with user id
+const checkCookie = (req) => {
+  if (req.cookies.user_id) {
+    return users[req.cookies.user_id];
+  }
+  return null;
+};
+
 //////////   GET ROUTES   //////////
 // GET for /register
 app.get('/register', (req, res) => {
+  if (checkCookie(req)) {
+    // if user is logged in and tries to access register page, redirect to /urls
+    return res.redirect('/urls');
+  }
   const templateVars = {
     urls: urlDatabase,
+    email: undefined
   };
-
-  if (users[req.cookies.user_id]) {
-    templateVars.email = users[req.cookies.user_id].email;
-  } else {
-    templateVars.email = undefined;
-    res.render('register', templateVars);
-  }
+  // if user is not logged in, render register page
+  res.render('register', templateVars);
 });
 
 app.get('/login', (req, res) => {
@@ -90,7 +103,7 @@ app.get('/u/:id',(req, res) => {
 // route to create a new short URL
 app.get('/urls/new', (req, res) => {
   // if user is logged in, pass data with users object
-  if (users[req.cookies.user_id]) {
+  if (checkCookie(req)) {
     const templateVars = {
       urls: urlDatabase,
       email: users[req.cookies.user_id].email
@@ -109,7 +122,7 @@ app.get('/urls/new', (req, res) => {
 // handle route parameters
 app.get('/urls/:id', (req, res) => {
   // data to pass to the ejs file
-  if (users[req.cookies.user_id]) {
+  if (checkCookie(req)) {
     const templateVars = {
       id: req.params.id,
       longURL: urlDatabase[req.params.id],
@@ -130,7 +143,7 @@ app.get('/urls/:id', (req, res) => {
 // route to render "/urls" page
 app.get('/urls', (req, res) => {
   // if user is logged in, pass data with users object
-  if (users[req.cookies.user_id]) {
+  if (checkCookie(req)) {
     const templateVars = {
       urls: urlDatabase,
       email: users[req.cookies.user_id].email
@@ -145,7 +158,6 @@ app.get('/urls', (req, res) => {
     email: undefined
   };
   res.render('urls_index', templateVars);
-
 });
 
 // home page route
@@ -187,7 +199,7 @@ app.post('/login', (req, res) => {
   // iterate through users database to see if email matches
   if (userLookup(req.body.email, req.body.password)) {
     // if email & password match, set cookie for user
-    res.cookie('user_id', userLookup(req.body.email).id);
+    res.cookie('user_id', userLookup(req.body.email, req.body.password).id);
     // send user to /urls
     return res.redirect('/urls');
   }
