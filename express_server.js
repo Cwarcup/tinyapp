@@ -86,7 +86,21 @@ app.get('/u/:id',(req, res) => {
 
 // route to create a new short URL
 app.get('/urls/new', (req, res) => {
-  res.render('urls_new');
+  // if user is logged in, pass data with users object
+  if (users[req.cookies.user_id]) {
+    const templateVars = {
+      urls: urlDatabase,
+      email: users[req.cookies.user_id].email
+    };
+    res.render('urls_new', templateVars);
+    // if user is not logged in, redirect to login page
+  } else {
+    const templateVars = {
+      urls: urlDatabase,
+      email: undefined
+    };
+    res.render('urls_new', templateVars);
+  }
 });
 
 // handle route parameters
@@ -101,16 +115,14 @@ app.get('/urls/:id', (req, res) => {
 
 // route to render "/urls" page
 app.get('/urls', (req, res) => {
-  const templateVars = {
-    urls: urlDatabase,
-  };
-
+  // if user is logged in, pass data with users object
   if (users[req.cookies.user_id]) {
     const templateVars = {
       urls: urlDatabase,
       email: users[req.cookies.user_id].email
     };
     res.render('urls_index', templateVars);
+    // if user is not logged in, redirect to login page
   } else {
     const templateVars = {
       urls: urlDatabase,
@@ -141,7 +153,7 @@ app.post('/register', (req, res) => {
   // console.log('users database: ', users); // works!
   // console.log("new user's id: ", newUser.id); //works!
 
-  // set cookie for new user
+  // set cookie for new user using newUser.id
   res.cookie('user_id', newUser.id);
 
   res.redirect('/urls');
