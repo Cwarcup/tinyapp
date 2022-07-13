@@ -34,6 +34,10 @@ const urlDatabase = {
   sdfs: {
     longURL: 'https://www.facebook.com/sdfsad',
     userID: 'cw',
+  },
+  sgq3y6: {
+    longURL: 'https://www.google.com/images',
+    userID: 'a',
   }
 
 };
@@ -160,17 +164,17 @@ app.get('/urls/new', (req, res) => {
 app.get('/urls/:id', (req, res) => {
   // check to see if user is logged in/has cookie
   const cookie = checkCookie(req);
-
+  console.log('cookie id: ', cookie.id);
   // if user is not logged in, redirect to login page
   if (!cookie) {
-    return res.redirect('/login');
+    return res.status(401).redirect('/login');
   }
 
   // check that short URL exists and userID in urlDatabase matches cookie id
-  if (urlDatabase[req.params.id] && urlDatabase[req.params.id].userID === cookie.id) {
+  if (urlDatabase[req.params.id].userID === cookie.id) {
     const templateVars = {
       id: req.params.id,
-      longURL: urlDatabase[req.params.id].longURL,
+      longURL: urlsForUser(cookie.id, urlDatabase)[req.params.id],
       email: cookie.email,
     };
     return res.render('urls_show', templateVars);
@@ -295,7 +299,6 @@ app.post('/urls/:id/delete', (req, res) => {
   if (checkCookie(req)) {
     // delete shortURL from urlDatabase
     delete urlDatabase[req.params.id];
-    console.log(`${req.params.id} has been deleted`);
     // redirect to urls_index page
     return res.redirect('/urls');
   }
@@ -304,12 +307,30 @@ app.post('/urls/:id/delete', (req, res) => {
     email: undefined,
     message: 'You must be logged in to delete a URL.'
   };
+  console.log('NO delete should occur: ', urlDatabase);
+
   // if user is not logged in, redirect to login page
-  res.render('login', templateVars);
+  res.status(400).render('login', templateVars);
+});
+
+// EDIT POST route to handle updates to long URL
+app.post('/urls/:id', (req, res) => {
+  // check if user logged in / has cookie
+  if (!checkCookie(req)) {
+    // if user is not logged in, redirect to login page
+    return res.status(401).redirect('/login');
+  }
+  res.redirect(`/urls/${req.params.id}`);
 });
 
 // UPDATE POST route to handle updates to long URL
+// accessible from /urls/:id page, update btn
 app.post('/urls/:id/update', (req, res) => {
+  // check if user logged in / has cookie
+  if (!checkCookie(req)) {
+    // if user is not logged in, redirect to login page
+    return res.status(401).redirect('/login');
+  }
   // update longURL in urlDatabase
   urlDatabase[req.params.id].longURL = req.body.longURL;
   // redirect to urls_index page
