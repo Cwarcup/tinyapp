@@ -67,8 +67,8 @@ const checkCookie = (req) => {
 //////////   GET ROUTES   //////////
 // GET for /register
 app.get('/register', (req, res) => {
+  // if user is logged in and tries to access register page, redirect to /urls
   if (checkCookie(req)) {
-    // if user is logged in and tries to access register page, redirect to /urls
     return res.redirect('/urls');
   }
   const templateVars = {
@@ -80,13 +80,15 @@ app.get('/register', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
+  // if user is logged in and tries to access login page, redirect to /urls
+  if (checkCookie(req)) {
+    return res.redirect('/urls');
+  }
   const templateVars = {
     urls: urlDatabase,
     email: undefined
   };
-
   res.render('login', templateVars);
-  // }
 });
 
 // redirect user to long URL if it exists
