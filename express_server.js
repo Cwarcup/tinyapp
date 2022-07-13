@@ -99,7 +99,7 @@ app.get('/login', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
     email: undefined,
-    message: 'Please log in to create a new URL.'
+    message: undefined
   };
   res.render('login', templateVars);
 });
@@ -253,7 +253,6 @@ app.post('/urls', (req, res) => {
     longURL: req.body.longURL,
     userID: req.cookies.user_id
   };
-  console.log('urlDatabase: ', urlDatabase);
   // redirect to new shortURL page
   res.redirect('/urls');
 });
@@ -266,10 +265,15 @@ app.post('/urls/:id/delete', (req, res) => {
     delete urlDatabase[req.params.id];
     console.log(`${req.params.id} has been deleted`);
     // redirect to urls_index page
-    res.redirect('/urls');
+    return res.redirect('/urls');
   }
+  const templateVars = {
+    urls: urlDatabase,
+    email: undefined,
+    message: 'You must be logged in to delete a URL.'
+  };
   // if user is not logged in, redirect to login page
-  res.redirect('/urls');
+  res.render('login', templateVars);
 });
 
 // UPDATE POST route to handle updates to long URL
