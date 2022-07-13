@@ -109,7 +109,8 @@ app.get('/register', (req, res) => {
   }
   const templateVars = {
     urls: urlDatabase,
-    email: undefined
+    email: undefined,
+    message: undefined,
   };
   // if user is not logged in, render register page
   res.render('register', templateVars);
@@ -223,13 +224,21 @@ app.post('/register', (req, res) => {
   // check if email is empty string, 404 error
   if (req.body.email === '') {
     console.log('email is empty: ', req.body.email);
-    return res.status(400).redirect('/register');
+    const templateVars = {
+      email: undefined,
+      message: 'Email cannot be empty. Please enter a valid email.'
+    };
+    return res.status(400).render('register', templateVars);
   }
 
   // check if email is already in use
-  if (userLookup(req.body.email)) {
+  if (!userLookup(req.body.email)) {
     console.log('email is already in use: ', req.body.email);
-    return res.status(400).redirect('/register');
+    const templateVars = {
+      email: undefined,
+      message: 'email is already in use. Please enter a different email.'
+    };
+    return res.status(400).render('register', templateVars);
   }
 
   // create new user object (userId, email, password)
@@ -255,10 +264,8 @@ app.post('/login', (req, res) => {
     return res.redirect('/urls');
   }
   const templateVars = {
-    message: 'Email or password is incorrect.',
+    message: 'Email or password is incorrect. Try again.',
     email: undefined,
-    
-
   };
   // if user with email can not be found, respond with 403
   console.log(`email ${req.body.email} NOT found`);
