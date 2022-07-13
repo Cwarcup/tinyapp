@@ -4,10 +4,10 @@ const app = express();
 const PORT = 8080; // default port 8080
 const cookieParser = require('cookie-parser');
 
-// add in EJS middlware
+// add in EJS middleware
 app.set('view engine', 'ejs');
 
-// use middwares
+// use middleware
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -98,9 +98,10 @@ app.get('/u/:id',(req, res) => {
   const longURL = urlDatabase[req.params.id];
   if (longURL) {
     res.redirect(longURL);
-  } else {
-    res.status(404).redirect('https://http.cat/404');
   }
+
+  res.status(404).redirect('https://http.cat/404');
+  
 });
 
 // route to create a new short URL
@@ -227,18 +228,24 @@ app.post('/logout', (req, res) => {
 // URLS homepage POST route
 // POST method to receive the form data from urls_new
 app.post('/urls', (req, res) => {
-  const shortURL = generateRandomString();
-  // add new shortURL to urlDatabase
-  urlDatabase[shortURL] = req.body.longURL;
-  // redirect to new shortURL page
-  // gets sent to the GET '/urls/:id'
-  res.redirect('/urls');
+  // if user is not logged in, redirect to login page
+  if (checkCookie(req)) {
+    const shortURL = generateRandomString();
+    // add new shortURL to urlDatabase
+    urlDatabase[shortURL] = req.body.longURL;
+    // redirect to new shortURL page
+    // gets sent to the GET '/urls/:id'
+    console.log('post req');
+    res.redirect('/urls');
+  }
+  res.send('user is not logged in').redirect('/login');
+
 });
 
 // DELETE POST route - delete a URL from the database
 app.post('/urls/:id/delete', (req, res) => {
+  // if user is logged in
   if (checkCookie(req)) {
-
     // delete shortURL from urlDatabase
     delete urlDatabase[req.params.id];
     console.log(`${req.params.id} has been deleted`);
