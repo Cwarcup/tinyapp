@@ -96,11 +96,16 @@ app.get('/login', (req, res) => {
 app.get('/u/:id',(req, res) => {
   // check if long URL exists
   const longURL = urlDatabase[req.params.id];
+  // if it does, sent user to long URL
   if (longURL) {
     res.redirect(longURL);
   }
-
-  res.status(404).redirect('https://http.cat/404');
+  // if it doesn't, send user to error page
+  const templateVars = {
+    id: req.params.id,
+    email: undefined
+  };
+  res.status(404).render('urls_notFound', templateVars);
   
 });
 
