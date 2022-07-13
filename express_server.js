@@ -48,11 +48,10 @@ const generateRandomString = () => {
 const userLookup = (email, password) => {
   for (let user in users) {
     const enteredEmail = users[user].email;
-    if (enteredEmail === email) {
-      const enteredPassword = users[user].password;
-      if (enteredPassword === password) {
-        return users[user];
-      }
+    const enteredPassword = users[user].password;
+
+    if (enteredEmail === email && enteredPassword === password) {
+      return users[user];
     }
   }
   return null;
@@ -109,7 +108,6 @@ app.get('/u/:id',(req, res) => {
     email: undefined
   };
   res.status(404).render('urls_notFound', templateVars);
-  
 });
 
 // route to create a new short URL
@@ -148,10 +146,8 @@ app.get('/urls/:id', (req, res) => {
     };
     res.status(404).render('urls_notFound', templateVars);
   }
-
-  console.log(req.params.id);
   // if user is not logged in, redirect to login page
-  return res.redirect('/urls');
+  return res.redirect('/login');
 });
 
 // route to render "/urls" page
