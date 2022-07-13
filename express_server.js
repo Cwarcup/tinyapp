@@ -126,18 +126,20 @@ app.get('/login', (req, res) => {
 
 // redirect user to long URL if it exists
 app.get('/u/:id',(req, res) => {
-  // check if long URL exists
-  const longURL = urlDatabase[req.params.id].longURL;
-  // if it does, sent user to long URL
-  if (longURL) {
-    res.redirect(longURL);
+  // check if URL exists
+  const urlFound = urlDatabase[req.params.id];
+  // if URL does not exist, it will be undefined
+  if (urlFound === undefined) {
+    const templateVars = {
+      id: req.params.id,
+      email: undefined,
+      message: undefined
+    };
+    // render the generic error page
+    return res.status(404).render('urls_notFound', templateVars);
   }
-  // if it doesn't, send user to error page
-  const templateVars = {
-    id: req.params.id,
-    email: undefined
-  };
-  res.status(404).render('urls_notFound', templateVars);
+  // if it does, sent user to long URL
+  res.redirect(urlFound.longURL);
 });
 
 // route to create a new short URL
@@ -156,28 +158,43 @@ app.get('/urls/new', (req, res) => {
 
 // handle route parameters
 app.get('/urls/:id', (req, res) => {
-  // data to pass to the ejs file
-  // must be logged in and valid short URL
-  if (checkCookie(req) && urlDatabase[req.params.id].longURL) {
+  // check to see if user is logged in/has cookie
+  const cookie = checkCookie(req);
+
+  // if user is not logged in, redirect to login page
+  if (!cookie) {
+    return res.redirect('/login');
+  }
+
+  // check that short URL exists and userID in urlDatabase matches cookie id
+  if (urlDatabase[req.params.id] && urlDatabase[req.params.id].userID === cookie.id) {
     const templateVars = {
       id: req.params.id,
       longURL: urlDatabase[req.params.id].longURL,
-      urls: urlDatabase,
-      email: users[req.cookies.user_id].email
+      email: cookie.email,
     };
     return res.render('urls_show', templateVars);
   }
 
+  // if (checkCookie(req) && urlDatabase[req.params.id].longURL) {
+  //   const templateVars = {
+  //     id: req.params.id,
+  //     longURL: urlDatabase[req.params.id].longURL,
+  //     urls: urlDatabase,
+  //     email: users[req.cookies.user_id].email
+  //   };
+  // }
+
   // user tries to access short URL that does NOT exist
-  if (!urlDatabase[req.params.id]) {
-    const templateVars = {
-      id: req.params.id,
-      email: undefined
-    };
-    res.status(404).render('urls_notFound', templateVars);
-  }
-  // if user is not logged in, redirect to login page
-  return res.redirect('/login');
+
+  const templateVars = {
+    id: req.params.id,
+    email: undefined,
+    message: 'URL does not exist or you do not have access to edit it.'
+  };
+  res.status(404).render('urls_notFound', templateVars);
+
+  
 });
 
 // route to render "/urls" page

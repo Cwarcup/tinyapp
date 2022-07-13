@@ -20,8 +20,11 @@
         <h2 class="card-title">OH NO!</h2>
         <div class="alert alert-danger" role="alert">
         <p class="card-text">
-          The short URL ID: <a href="/u/<%= id %>"><%= id %></a> is not found.
+          The URL ID: <a href="/u/<%= id %>"><%= id %></a> is not found
         </p>
+        <% if (message) { %>
+          <p><%= message %></p>
+        <% } %>
         <p>Try a different short URL</p>
         </div>
       </div>
