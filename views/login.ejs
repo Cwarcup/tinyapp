@@ -20,10 +20,16 @@
   <body>
     <%- include('partials/_header') %>
     <main style="margin: 1em;">
-        <div class="container h-100">
-          <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col-12 col-md-9 col-lg-7 col-xl-6">
-              <div class="card" style="border-radius: 15px;">
+      <div class="container h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+            <!-- section for if not logged in -->
+            <% if (message) { %>
+              <div class="alert alert-danger" role="alert">
+                <%= message %>
+              </div>
+            <% } %>
+            <div class="card" style="border-radius: 15px;">
                 <div class="card-body p-5">
                   <h2 class="text-center mb-3">Login</h2>
                   <form action="/login" method="POST">

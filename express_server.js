@@ -86,7 +86,8 @@ app.get('/login', (req, res) => {
   }
   const templateVars = {
     urls: urlDatabase,
-    email: undefined
+    email: undefined,
+    message: 'Please log in to create a new URL.'
   };
   res.render('login', templateVars);
 });
