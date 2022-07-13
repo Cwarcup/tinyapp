@@ -143,7 +143,8 @@ app.get('/urls', (req, res) => {
   if (checkCookie(req)) {
     const templateVars = {
       urls: urlDatabase,
-      email: users[req.cookies.user_id].email
+      email: users[req.cookies.user_id].email,
+      message: undefined
     };
     // render page with data from users object
     return res.render('urls_index', templateVars);
@@ -152,7 +153,8 @@ app.get('/urls', (req, res) => {
   // if user is not logged in, redirect to login page
   const templateVars = {
     urls: urlDatabase,
-    email: undefined
+    email: undefined,
+    message: 'You must be logged in to create, edit, or delete a URL.'
   };
   res.render('urls_index', templateVars);
 });
