@@ -47,8 +47,10 @@ const generateRandomString = () => {
 // user lookup helper function, checks email and password
 const userLookup = (email, password) => {
   for (let user in users) {
-    if (users[user].email === email) {
-      if (users[user].password === password) {
+    const enteredEmail = users[user].email;
+    if (enteredEmail === email) {
+      const enteredPassword = users[user].password;
+      if (enteredPassword === password) {
         return users[user];
       }
     }
@@ -58,8 +60,9 @@ const userLookup = (email, password) => {
 
 // check if browser has cookie with user id
 const checkCookie = (req) => {
-  if (req.cookies.user_id) {
-    return users[req.cookies.user_id];
+  const cookie = req.cookies.user_id;
+  if (cookie) {
+    return users[cookie];
   }
   return null;
 };
