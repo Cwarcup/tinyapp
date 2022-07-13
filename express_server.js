@@ -122,15 +122,17 @@ app.get('/urls', (req, res) => {
       urls: urlDatabase,
       email: users[req.cookies.user_id].email
     };
-    res.render('urls_index', templateVars);
-    // if user is not logged in, redirect to login page
-  } else {
-    const templateVars = {
-      urls: urlDatabase,
-      email: undefined
-    };
-    res.render('urls_index', templateVars);
+    // render page with data from users object
+    return res.render('urls_index', templateVars);
   }
+  
+  // if user is not logged in, redirect to login page
+  const templateVars = {
+    urls: urlDatabase,
+    email: undefined
+  };
+  res.render('urls_index', templateVars);
+
 });
 
 // home page route
@@ -145,13 +147,13 @@ app.post('/register', (req, res) => {
   // check if email is empty string, 404 error
   if (req.body.email === '') {
     console.log('email is empty: ', req.body.email);
-    res.status(400).redirect('/register');
+    return res.status(400).redirect('/register');
   }
 
   // check if email is already in use
   if (userLookup(req.body.email)) {
     console.log('email is already in use: ', req.body.email);
-    res.status(400).redirect('/register');
+    return res.status(400).redirect('/register');
   }
 
   // create new user object (userId, email, password)
@@ -171,15 +173,19 @@ app.post('/register', (req, res) => {
 app.post('/login', (req, res) => {
   // iterate through users database to see if email matches
   if (userLookup(req.body.email)) {
-    // if email matches, set cookie for user
-    console.log('email matches: ', req.body.email);
-    res.cookie('user_id', userLookup(req.body.email).id);
-    return res.redirect('/urls');
+    // compare the password to the password in the database
+    if (userLookup(req.body.email).password === req.body.password) {
+    // if email & password match, set cookie for user
+      res.cookie('user_id', userLookup(req.body.email).id);
+      return res.redirect('/urls');
+    }
+  }
+  // if user with email can not be found, respond with 403
+  if (!userLookup(req.body.email)) {
+    console.log(`email ${req.body.email} NOT found`);
+    return res.status(403).redirect('/login');
   }
 
-  // if email doesn't match, redirect to register page
-  console.log(`email ${req.body.email} NOT found`);
-  res.redirect('/register');
 });
 
 // LOGOUT POST route
