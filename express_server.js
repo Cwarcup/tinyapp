@@ -214,7 +214,21 @@ app.get('/urls', (req, res) => {
 
 // home page route
 app.get('/', (req, res) => {
-  res.redirect('/urls');
+  // if user is logged in, pass data with users object
+  if (checkCookie(req)) {
+    const userUrls = urlsForUser(req.cookies.user_id, urlDatabase);
+
+    const templateVars = {
+      isLoggedIn: true,
+      urls: userUrls,
+      email: users[req.cookies.user_id].email,
+      message: undefined,
+    };
+    // render page with data from users object
+    return res.render('urls_index', templateVars);
+  }
+  // if user is not logged in, redirect to login page
+  res.redirect('/login');
 });
 
 ///////////////// POST routes ///////////////
