@@ -166,29 +166,22 @@ app.get('/urls/:id', (req, res) => {
   const cookie = checkCookie(req);
   console.log('cookie id: ', cookie.id);
   // if user is not logged in, redirect to login page
-  if (!cookie) {
-    return res.status(401).redirect('/login');
+  if (!cookie || !urlDatabase[req.params.id] || urlDatabase[req.params.id].userID !== cookie.id) {
+    const templateVars = {
+      id: req.params.id,
+      email: undefined,
+      message: 'URL does not exist or you do not have access to edit it.'
+    };
+    res.status(404).render('urls_notFound', templateVars);
   }
 
   // check that short URL exists and userID in urlDatabase matches cookie id
-  if (urlDatabase[req.params.id].userID === cookie.id) {
-    const templateVars = {
-      id: req.params.id,
-      longURL: urlsForUser(cookie.id, urlDatabase)[req.params.id],
-      email: cookie.email,
-    };
-    return res.render('urls_show', templateVars);
-  }
-
-  // user tries to access short URL that does NOT exist
   const templateVars = {
     id: req.params.id,
-    email: undefined,
-    message: 'URL does not exist or you do not have access to edit it.'
+    longURL: urlsForUser(cookie.id, urlDatabase)[req.params.id],
+    email: cookie.email,
   };
-  res.status(404).render('urls_notFound', templateVars);
-
-  
+  res.render('urls_show', templateVars);
 });
 
 // route to render "/urls" page
@@ -295,30 +288,47 @@ app.post('/urls', (req, res) => {
 
 // DELETE POST route - delete a URL from the database
 app.post('/urls/:id/delete', (req, res) => {
-  // if user is logged in
-  if (checkCookie(req)) {
-    // delete shortURL from urlDatabase
-    delete urlDatabase[req.params.id];
-    // redirect to urls_index page
-    return res.redirect('/urls');
+  if (urlDatabase[req.params.id] === undefined) {
+    // if short URL does not exist, redirect to urls_index page
+    console.log('short URL does not exist');
+    return res.status(404).redirect('/urls');
   }
-  const templateVars = {
-    urls: urlDatabase,
-    email: undefined,
-    message: 'You must be logged in to delete a URL.'
-  };
-  console.log('NO delete should occur: ', urlDatabase);
-
   // if user is not logged in, redirect to login page
-  res.status(400).render('login', templateVars);
+  if (!checkCookie(req)) {
+    console.log('Please log in to delete a URL.');
+    return res.status(403).redirect('/login');
+  }
+
+  // check if user has access to delete URL (own the URL)
+  if (urlDatabase[req.params.id].userID !== req.cookies.user_id) {
+    console.log('You do not have access to delete this URL.');
+    return res.status(403).redirect('/urls');
+  }
+
+  // delete shortURL from urlDatabase
+  delete urlDatabase[req.params.id];
+  // redirect to urls_index page
+  return res.redirect('/urls');
+
 });
 
 // EDIT POST route to handle updates to long URL
 app.post('/urls/:id', (req, res) => {
+  if (urlDatabase[req.params.id] === undefined) {
+    // if short URL does not exist, redirect to urls_index page
+    console.log('URL does not exist.');
+    return res.status(404).redirect('/urls');
+  }
   // check if user logged in / has cookie
   if (!checkCookie(req)) {
     // if user is not logged in, redirect to login page
+    console.log('Please log in to edit a URL.');
     return res.status(401).redirect('/login');
+  }
+  // check if user has access to edit URL (own the URL)
+  if (urlDatabase[req.params.id].userID !== req.cookies.user_id) {
+    console.log('You do not have access to edit this URL.');
+    return res.status(403).redirect('/urls');
   }
   res.redirect(`/urls/${req.params.id}`);
 });
