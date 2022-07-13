@@ -17,17 +17,26 @@ app.use(cookieParser());
 const urlDatabase = {
   b6UTxQ: {
     longURL: 'https://www.tsn.ca',
-    userID: 'aJ48lW',
+    userID: 'userRandomID',
   },
   i3BoGr: {
     longURL: 'https://www.google.ca',
-    userID: 'aJ48lW',
+    userID: 'cw',
   },
+  lgLjZx: {
+    longURL: 'https://www.yahoo.ca',
+    userID: 'user2RandomID',
+  },
+  kjbk: {
+    longURL: 'https://www.facebook.com',
+    userID: 'cw',
+  },
+  sdfs: {
+    longURL: 'https://www.facebook.com/sdfsad',
+    userID: 'cw',
+  }
+
 };
-// const urlDatabase = {
-//   'b2xVn2': 'http://www.lighthouselabs.ca',
-//   '9sm5xK': 'http://www.google.com'
-// };
 
 // user database
 const users = {
@@ -74,6 +83,17 @@ const checkCookie = (req) => {
     return users[cookie];
   }
   return null;
+};
+
+// filter URLdatabase and return only URLs that belong to user
+const urlsForUser = (id, urlDatabase) => {
+  const userUrls = {};
+  for (let shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      userUrls[shortURL] = urlDatabase[shortURL].longURL;
+    }
+  }
+  return userUrls;
 };
 
 //////////   GET ROUTES   //////////
@@ -168,16 +188,19 @@ app.get('/urls', (req, res) => {
       isLoggedIn: false,
       urls: urlDatabase,
       email: undefined,
-      message: 'You must be logged in to view URLs.'
+      message: 'You must be logged in to view URLs. Please log in or register.'
     };
     return res.render('urls_index', templateVars);
   }
+
+  //get URLs for specific user
+  const userUrls = urlsForUser(req.cookies.user_id, urlDatabase);
+
   // if user is logged in, pass data with users object
   const templateVars = {
     isLoggedIn: true,
-    urls: urlDatabase,
+    urls: userUrls,
     email: users[req.cookies.user_id].email,
-    message: undefined
   };
   // render page with data from users object
   return res.render('urls_index', templateVars);
