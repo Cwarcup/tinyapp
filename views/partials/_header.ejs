@@ -16,26 +16,28 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <a class="nav-item nav-link" href="/register">Register</a>
       </div>
       <div class="ml-auto">
         <% if (email !== undefined) { %>
           <form class="form-inline" action="/logout" method="POST">
             <div class="form-group mb-2">
-              <label for="loggedInUsername" class="m-2">
-                Logged in as: <%= email %>
+              <label for="loginEmail" class="m-2">
+                <div class="text-white-50">Logged In As:</div>
+                <div class="text-white pl-2">
+                  <%= email %>
+                </div>
               </label>
               <input type="hidden" value="<%= email %>" />
               <button name="logout" type="submit" class="btn btn-outline-dark">Logout</button>
             </div>
           </form>
           <% } else { %>
-            <a href="/login">
-              <button type="submit"  class="btn btn-outline-dark">Login</button>
-            </a>
+            <div class="navbar-nav">
+              <a class="nav-item nav-link" href="/login">Login</a>
+              <a class="nav-item nav-link" href="/register">Register</a>
+            </div>
         <% } %>
         </div>
     </div>
-
   </nav>
 </header>

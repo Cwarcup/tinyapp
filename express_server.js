@@ -107,11 +107,22 @@ app.get('/urls/new', (req, res) => {
 // handle route parameters
 app.get('/urls/:id', (req, res) => {
   // data to pass to the ejs file
-  let templateVars = {
+  if (users[req.cookies.user_id]) {
+    const templateVars = {
+      id: req.params.id,
+      longURL: urlDatabase[req.params.id],
+      urls: urlDatabase,
+      email: users[req.cookies.user_id].email
+    };
+    return res.render('urls_show', templateVars);
+  }
+  // if user is not logged in, redirect to login page
+  const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id]
+    longURL: urlDatabase[req.params.id],
+    email: undefined
   };
-  res.render('urls_show', templateVars);
+  return res.render('urls_show', templateVars);
 });
 
 // route to render "/urls" page
@@ -179,21 +190,19 @@ app.post('/login', (req, res) => {
       res.cookie('user_id', userLookup(req.body.email).id);
       return res.redirect('/urls');
     }
+    return res.status(403).redirect('/login');
   }
   // if user with email can not be found, respond with 403
   if (!userLookup(req.body.email)) {
     console.log(`email ${req.body.email} NOT found`);
     return res.status(403).redirect('/login');
   }
-
 });
 
 // LOGOUT POST route
 app.post('/logout', (req, res) => {
   // remove the cookie using the cookie name
   res.clearCookie('user_id');
-  console.log('logged out');
-  console.log('users database: ', users);
   res.redirect('/urls');
 });
 
@@ -205,7 +214,7 @@ app.post('/urls', (req, res) => {
   urlDatabase[shortURL] = req.body.longURL;
   // redirect to new shortURL page
   // gets sent to the GET '/urls/:id'
-  res.redirect(`/u/${shortURL}`);
+  res.redirect('/urls');
 });
 
 // DELETE POST route - delete a URL from the database
