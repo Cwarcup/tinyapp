@@ -39,11 +39,13 @@ const generateRandomString = () => {
   return randomString;
 };
 
-// user lookup helper function
-const userLookup = (email) => {
+// user lookup helper function, checks email and password
+const userLookup = (email, password) => {
   for (let user in users) {
     if (users[user].email === email) {
-      return users[user];
+      if (users[user].password === password) {
+        return users[user];
+      }
     }
   }
   return null;
@@ -183,17 +185,14 @@ app.post('/register', (req, res) => {
 // LOGIN POST route
 app.post('/login', (req, res) => {
   // iterate through users database to see if email matches
-  if (userLookup(req.body.email)) {
-    // compare the password to the password in the database
-    if (userLookup(req.body.email).password === req.body.password) {
+  if (userLookup(req.body.email, req.body.password)) {
     // if email & password match, set cookie for user
-      res.cookie('user_id', userLookup(req.body.email).id);
-      return res.redirect('/urls');
-    }
-    return res.status(403).redirect('/login');
+    res.cookie('user_id', userLookup(req.body.email).id);
+    // send user to /urls
+    return res.redirect('/urls');
   }
   // if user with email can not be found, respond with 403
-  if (!userLookup(req.body.email)) {
+  if (!userLookup(req.body.email, req.body.password)) {
     console.log(`email ${req.body.email} NOT found`);
     return res.status(403).redirect('/login');
   }
