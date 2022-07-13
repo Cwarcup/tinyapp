@@ -111,8 +111,8 @@ app.get('/urls/new', (req, res) => {
       email: users[req.cookies.user_id].email
     };
     res.render('urls_new', templateVars);
-    // if user is not logged in, redirect to login page
   }
+  // if user is not logged in, redirect to login page
   res.redirect('/login');
 });
 
@@ -129,12 +129,7 @@ app.get('/urls/:id', (req, res) => {
     return res.render('urls_show', templateVars);
   }
   // if user is not logged in, redirect to login page
-  const templateVars = {
-    id: req.params.id,
-    longURL: urlDatabase[req.params.id],
-    email: undefined
-  };
-  return res.render('urls_show', templateVars);
+  return res.redirect('/urls');
 });
 
 // route to render "/urls" page
@@ -156,7 +151,7 @@ app.get('/urls', (req, res) => {
     email: undefined,
     message: 'You must be logged in to create, edit, or delete a URL.'
   };
-  res.render('urls_index', templateVars);
+  return res.render('urls_index', templateVars);
 });
 
 // home page route
@@ -229,10 +224,15 @@ app.post('/urls', (req, res) => {
 
 // DELETE POST route - delete a URL from the database
 app.post('/urls/:id/delete', (req, res) => {
-  // delete shortURL from urlDatabase
-  delete urlDatabase[req.params.id];
-  console.log(`${req.params.id} has been deleted`);
-  // redirect to urls_index page
+  if (checkCookie(req)) {
+
+    // delete shortURL from urlDatabase
+    delete urlDatabase[req.params.id];
+    console.log(`${req.params.id} has been deleted`);
+    // redirect to urls_index page
+    res.redirect('/urls');
+  }
+  // if user is not logged in, redirect to login page
   res.redirect('/urls');
 });
 
