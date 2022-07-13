@@ -119,7 +119,8 @@ app.get('/urls/new', (req, res) => {
 // handle route parameters
 app.get('/urls/:id', (req, res) => {
   // data to pass to the ejs file
-  if (checkCookie(req)) {
+  // must be logged in and valid short URL
+  if (checkCookie(req) && urlDatabase[req.params.id]) {
     const templateVars = {
       id: req.params.id,
       longURL: urlDatabase[req.params.id],
@@ -128,6 +129,17 @@ app.get('/urls/:id', (req, res) => {
     };
     return res.render('urls_show', templateVars);
   }
+
+  // user tries to access short URL that does NOT exist
+  if (!urlDatabase[req.params.id]) {
+    const templateVars = {
+      id: req.params.id,
+      email: undefined
+    };
+    res.status(404).render('urls_notFound', templateVars);
+  }
+
+  console.log(req.params.id);
   // if user is not logged in, redirect to login page
   return res.redirect('/urls');
 });
