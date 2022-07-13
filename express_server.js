@@ -176,17 +176,7 @@ app.get('/urls/:id', (req, res) => {
     return res.render('urls_show', templateVars);
   }
 
-  // if (checkCookie(req) && urlDatabase[req.params.id].longURL) {
-  //   const templateVars = {
-  //     id: req.params.id,
-  //     longURL: urlDatabase[req.params.id].longURL,
-  //     urls: urlDatabase,
-  //     email: users[req.cookies.user_id].email
-  //   };
-  // }
-
   // user tries to access short URL that does NOT exist
-
   const templateVars = {
     id: req.params.id,
     email: undefined,
