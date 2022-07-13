@@ -112,13 +112,8 @@ app.get('/urls/new', (req, res) => {
     };
     res.render('urls_new', templateVars);
     // if user is not logged in, redirect to login page
-  } else {
-    const templateVars = {
-      urls: urlDatabase,
-      email: undefined
-    };
-    res.render('urls_new', templateVars);
   }
+  res.redirect('/login');
 });
 
 // handle route parameters
