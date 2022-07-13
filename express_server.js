@@ -15,9 +15,19 @@ app.use(cookieParser());
 //////////////// data /////////////////////
 // URL database
 const urlDatabase = {
-  'b2xVn2': 'http://www.lighthouselabs.ca',
-  '9sm5xK': 'http://www.google.com'
+  b6UTxQ: {
+    longURL: 'https://www.tsn.ca',
+    userID: 'aJ48lW',
+  },
+  i3BoGr: {
+    longURL: 'https://www.google.ca',
+    userID: 'aJ48lW',
+  },
 };
+// const urlDatabase = {
+//   'b2xVn2': 'http://www.lighthouselabs.ca',
+//   '9sm5xK': 'http://www.google.com'
+// };
 
 // user database
 const users = {
@@ -97,7 +107,7 @@ app.get('/login', (req, res) => {
 // redirect user to long URL if it exists
 app.get('/u/:id',(req, res) => {
   // check if long URL exists
-  const longURL = urlDatabase[req.params.id];
+  const longURL = urlDatabase[req.params.id].longURL;
   // if it does, sent user to long URL
   if (longURL) {
     res.redirect(longURL);
@@ -128,10 +138,10 @@ app.get('/urls/new', (req, res) => {
 app.get('/urls/:id', (req, res) => {
   // data to pass to the ejs file
   // must be logged in and valid short URL
-  if (checkCookie(req) && urlDatabase[req.params.id]) {
+  if (checkCookie(req) && urlDatabase[req.params.id].longURL) {
     const templateVars = {
       id: req.params.id,
-      longURL: urlDatabase[req.params.id],
+      longURL: urlDatabase[req.params.id].longURL,
       urls: urlDatabase,
       email: users[req.cookies.user_id].email
     };
@@ -232,18 +242,20 @@ app.post('/logout', (req, res) => {
 // URLS homepage POST route
 // POST method to receive the form data from urls_new
 app.post('/urls', (req, res) => {
-  // if user is not logged in, redirect to login page
-  if (checkCookie(req)) {
-    const shortURL = generateRandomString();
-    // add new shortURL to urlDatabase
-    urlDatabase[shortURL] = req.body.longURL;
-    // redirect to new shortURL page
-    // gets sent to the GET '/urls/:id'
-    console.log('post req');
-    res.redirect('/urls');
+  if (!checkCookie(req)) {
+    // if user is not logged in, redirect to login page
+    return res.send('user is not logged in').redirect('/login');
   }
-  res.send('user is not logged in').redirect('/login');
-
+  const shortURL = generateRandomString();
+  console.log('long URL: ', req.body.longURL);
+  // add new shortURL to urlDatabase
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
+    userID: req.cookies.user_id
+  };
+  console.log('urlDatabase: ', urlDatabase);
+  // redirect to new shortURL page
+  res.redirect('/urls');
 });
 
 // DELETE POST route - delete a URL from the database
@@ -263,7 +275,7 @@ app.post('/urls/:id/delete', (req, res) => {
 // UPDATE POST route to handle updates to long URL
 app.post('/urls/:id/update', (req, res) => {
   // update longURL in urlDatabase
-  urlDatabase[req.params.id] = req.body.longURL;
+  urlDatabase[req.params.id].longURL = req.body.longURL;
   // redirect to urls_index page
   res.redirect(`/urls/${req.params.id}`);
 });
