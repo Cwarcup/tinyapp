@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const app = express();
 const PORT = 8080; // default port 8080
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 
 // add in EJS middleware
 app.set('view engine', 'ejs');
@@ -265,10 +266,11 @@ app.post('/register', (req, res) => {
   }
 
   // create new user object (userId, email, password)
+  const hashedPassword = bcrypt.hashSync(req.body.password, 10);
   const newUser = {
     id: generateRandomString(),
     email: req.body.email,
-    password: req.body.password
+    password: hashedPassword
   };
   // add newUser to users database
   users[newUser.id] = newUser;
