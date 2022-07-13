@@ -12,6 +12,7 @@ app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+//////////////// data /////////////////////
 // URL database
 const urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
@@ -31,17 +32,21 @@ const users = {
     password: 'dishwasher-funk',
   },
 };
-
-// 1. register - route working
-// 2. create new object in the users object - post request
-// "login" - checks the users object for a matching email
-// if matches -> great -> create cookie, redirect home
-// if not, redirect to register page
-
+//////////// helper functions //////////////
 // generate random string
 const generateRandomString = () => {
   const randomString = Math.random().toString(36).substring(7);
   return randomString;
+};
+
+// user lookup helper function
+const userLookup = (email) => {
+  for (let user in users) {
+    if (users[user].email === email) {
+      return users[user];
+    }
+  }
+  return null;
 };
 
 //////////   GET ROUTES   //////////
@@ -65,10 +70,6 @@ app.get('/login', (req, res) => {
     email: undefined
   };
 
-  // if (users[req.cookies.user_id]) {
-  //   res.redirect('/');
-  // } else {
-  //   templateVars.email = undefined;
   res.render('login', templateVars);
   // }
 });
@@ -139,8 +140,20 @@ app.get('/', (req, res) => {
 
 ///////////////// POST routes ///////////////
 
-// POST route for /register
+// REGISTER POST route
 app.post('/register', (req, res) => {
+  // check if email is empty string, 404 error
+  if (req.body.email === '') {
+    console.log('email is empty: ', req.body.email);
+    res.status(400).redirect('/register');
+  }
+
+  // check if email is already in use
+  if (userLookup(req.body.email)) {
+    console.log('email is already in use: ', req.body.email);
+    res.status(400).redirect('/register');
+  }
+
   // create new user object (userId, email, password)
   const newUser = {
     id: generateRandomString(),
@@ -149,32 +162,27 @@ app.post('/register', (req, res) => {
   };
   // add newUser to users database
   users[newUser.id] = newUser;
-
-  // console.log('users database: ', users); // works!
-  // console.log("new user's id: ", newUser.id); //works!
-
   // set cookie for new user using newUser.id
   res.cookie('user_id', newUser.id);
-
   res.redirect('/urls');
 });
 
-// post method to /login
+// LOGIN POST route
 app.post('/login', (req, res) => {
   // iterate through users database to see if email matches
-  for (let user in users) {
-    if (users[user].email === req.body.email) {
-      // if email matches, set cookie for user
-      res.cookie('user_id', users[user].id);
-      res.redirect('/urls');
-    }
+  if (userLookup(req.body.email)) {
+    // if email matches, set cookie for user
+    console.log('email matches: ', req.body.email);
+    res.cookie('user_id', userLookup(req.body.email).id);
+    return res.redirect('/urls');
   }
+
   // if email doesn't match, redirect to register page
   console.log(`email ${req.body.email} NOT found`);
   res.redirect('/register');
 });
 
-// logout endpoint
+// LOGOUT POST route
 app.post('/logout', (req, res) => {
   // remove the cookie using the cookie name
   res.clearCookie('user_id');
@@ -183,6 +191,7 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
+// URLS homepage POST route
 // POST method to receive the form data from urls_new
 app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
@@ -193,7 +202,7 @@ app.post('/urls', (req, res) => {
   res.redirect(`/u/${shortURL}`);
 });
 
-// POST method to handle deleted URLs
+// DELETE POST route - delete a URL from the database
 app.post('/urls/:id/delete', (req, res) => {
   // delete shortURL from urlDatabase
   delete urlDatabase[req.params.id];
@@ -202,7 +211,7 @@ app.post('/urls/:id/delete', (req, res) => {
   res.redirect('/urls');
 });
 
-// POST method to handle updates to long URL
+// UPDATE POST route to handle updates to long URL
 app.post('/urls/:id/update', (req, res) => {
   // update longURL in urlDatabase
   urlDatabase[req.params.id] = req.body.longURL;

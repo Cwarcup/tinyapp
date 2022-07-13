@@ -25,7 +25,7 @@
               <label for="loggedInUsername" class="m-2">
                 Logged in as: <%= email %>
               </label>
-              <input type="hidden" value="<%= email %>">
+              <input type="hidden" value="<%= email %>" />
               <button name="logout" type="submit" class="btn btn-outline-dark">Logout</button>
             </div>
           </form>
@@ -33,19 +33,6 @@
             <a href="/login">
               <button type="submit"  class="btn btn-outline-dark">Login</button>
             </a>
-
-          <!-- <form class="form-inline" action="/login" method="POST">
-            <div class="form-group mb-2">
-              <input
-              class="form-control"
-              type="text"
-              name="email"
-              placeholder="Enter your email"
-              style="width: 200px; margin: 1em"
-              />
-              <button type="submit" class="btn btn-outline-dark">Login</button>
-            </div>
-          </form> -->
         <% } %>
         </div>
     </div>
