@@ -30,7 +30,11 @@
             </div>
           </form>
           <% } else { %>
-          <form class="form-inline" action="/login" method="POST">
+            <a href="/login">
+              <button type="submit"  class="btn btn-outline-dark">Login</button>
+            </a>
+
+          <!-- <form class="form-inline" action="/login" method="POST">
             <div class="form-group mb-2">
               <input
               class="form-control"
@@ -41,7 +45,7 @@
               />
               <button type="submit" class="btn btn-outline-dark">Login</button>
             </div>
-          </form>
+          </form> -->
         <% } %>
         </div>
     </div>

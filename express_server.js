@@ -59,6 +59,20 @@ app.get('/register', (req, res) => {
   }
 });
 
+app.get('/login', (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    email: undefined
+  };
+
+  // if (users[req.cookies.user_id]) {
+  //   res.redirect('/');
+  // } else {
+  //   templateVars.email = undefined;
+  res.render('login', templateVars);
+  // }
+});
+
 // redirect user to long URL if it exists
 app.get('/u/:id',(req, res) => {
   // check if long URL exists
@@ -92,10 +106,16 @@ app.get('/urls', (req, res) => {
   };
 
   if (users[req.cookies.user_id]) {
-    templateVars.email = users[req.cookies.user_id].email;
+    const templateVars = {
+      urls: urlDatabase,
+      email: users[req.cookies.user_id].email
+    };
     res.render('urls_index', templateVars);
   } else {
-    templateVars.email = undefined;
+    const templateVars = {
+      urls: urlDatabase,
+      email: undefined
+    };
     res.render('urls_index', templateVars);
   }
 });
@@ -129,20 +149,16 @@ app.post('/register', (req, res) => {
 
 // post method to /login
 app.post('/login', (req, res) => {
-  // get the email from login form
-  const email = users[req.body.email];
   // iterate through users database to see if email matches
   for (let user in users) {
     if (users[user].email === req.body.email) {
       // if email matches, set cookie for user
       res.cookie('user_id', users[user].id);
-      console.log('users database: ', users);
       res.redirect('/urls');
     }
   }
   // if email doesn't match, redirect to register page
-  console.log('users database: NO MATCH', users);
-
+  console.log(`email ${req.body.email} NOT found`);
   res.redirect('/register');
 });
 
@@ -150,6 +166,8 @@ app.post('/login', (req, res) => {
 app.post('/logout', (req, res) => {
   // remove the cookie using the cookie name
   res.clearCookie('user_id');
+  console.log('logged out');
+  console.log('users database: ', users);
   res.redirect('/urls');
 });
 
