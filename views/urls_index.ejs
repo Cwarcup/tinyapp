@@ -21,39 +21,53 @@
     <%- include('partials/_header') %>
     <main style="margin: 1em;">
       <!-- section for if not logged in -->
-      <% if (message) { %>
-        <div class="alert alert-danger" role="alert">
-          <%= message %>
-        </div>
+      <% if (!isLoggedIn) { %>
+        <div class="container h-100">
+          <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+              <!-- section for if not logged in -->
+              <% if (message) { %>
+                <div class="alert alert-danger" role="alert">
+                  <%= message %>
+                </div>
+              <% } %>
+              </div>
+            </div>
+          </div>
       <% } %>
-      <h3>My URLs</h3>
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">Short URL ID</th>
-            <th scope="col">Long URL</th>
-            <th scope="col">Edit</th>
-            <th scope="col">Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% for (let id in urls) { %>
+
+      <!-- if user is logged in, display URLS -->
+      <% if (isLoggedIn) { %>
+
+        <h3>My URLs</h3>
+        <table class="table">
+          <thead>
             <tr>
-              <td><%= id %></td>
-              <td><%= urls[id].longURL %></td>
-              <td>
-                <a class="btn btn-outline-primary" href="/urls/<%= id %>" role="button">Edit</a>
-              </td>
-              <td>
-                <form action="/urls/<%= id %>/delete" method="POST">
-                  <input type="hidden" name="delete" value="<%= id %>" />
-                  <button type="submit" id="delete" class="btn btn-outline-danger">Delete</button>
-                </form>
-              </td>
+              <th scope="col">Short URL ID</th>
+              <th scope="col">Long URL</th>
+              <th scope="col">Edit</th>
+              <th scope="col">Delete</th>
             </tr>
+          </thead>
+          <tbody>
+            <% for (let id in urls) { %>
+              <tr>
+                <td><%= id %></td>
+                <td><%= urls[id].longURL %></td>
+                <td>
+                  <a class="btn btn-outline-primary" href="/urls/<%= id %>" role="button">Edit</a>
+                </td>
+                <td>
+                  <form action="/urls/<%= id %>/delete" method="POST">
+                    <input type="hidden" name="delete" value="<%= id %>" />
+                    <button type="submit" id="delete" class="btn btn-outline-danger">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
           <% } %>
-        </tbody>
-      </table>
     </main>
     <!-- Bootstrap JS -->
     <script

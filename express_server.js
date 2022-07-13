@@ -162,24 +162,26 @@ app.get('/urls/:id', (req, res) => {
 
 // route to render "/urls" page
 app.get('/urls', (req, res) => {
-  // if user is logged in, pass data with users object
-  if (checkCookie(req)) {
+  if (!checkCookie(req)) {
+    // if user is not logged in, redirect to login page
     const templateVars = {
+      isLoggedIn: false,
       urls: urlDatabase,
-      email: users[req.cookies.user_id].email,
-      message: undefined
+      email: undefined,
+      message: 'You must be logged in to view URLs.'
     };
-    // render page with data from users object
     return res.render('urls_index', templateVars);
   }
-  
-  // if user is not logged in, redirect to login page
+  // if user is logged in, pass data with users object
   const templateVars = {
+    isLoggedIn: true,
     urls: urlDatabase,
-    email: undefined,
-    message: 'You must be logged in to create, edit, or delete a URL.'
+    email: users[req.cookies.user_id].email,
+    message: undefined
   };
+  // render page with data from users object
   return res.render('urls_index', templateVars);
+  
 });
 
 // home page route
