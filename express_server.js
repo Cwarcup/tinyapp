@@ -161,13 +161,22 @@ app.get('/urls/new', (req, res) => {
   res.redirect('/login');
 });
 
-// handle route parameters
+// GET for editing a URL
 app.get('/urls/:id', (req, res) => {
   // check to see if user is logged in/has cookie
   const cookie = checkCookie(req);
-  console.log('cookie id: ', cookie.id);
-  // if user is not logged in, redirect to login page
-  if (!cookie || !urlDatabase[req.params.id] || urlDatabase[req.params.id].userID !== cookie.id) {
+  //if user is not logged in
+  if (!cookie) {
+    // redirect to login page
+    const templateVars = {
+      id: req.params.id,
+      email: undefined,
+      message: 'You must be logged in to view this page'
+    };
+    return res.status(401).render('login', templateVars);
+  }
+  // if user is not logged in OR URL does not exist, OR URL does
+  if (!urlDatabase[req.params.id] || urlDatabase[req.params.id].userID !== cookie.id) {
     const templateVars = {
       id: req.params.id,
       email: undefined,
