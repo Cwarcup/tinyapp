@@ -72,35 +72,34 @@ const users = {
 const { generateRandomString, getUserByEmail, getCookie, urlsForUser } = require('./helpers');
 
 //////////   GET ROUTES   //////////
-// GET for /register
+// GET for /register - if user is not logged in, render register page. Else, redirect to /urls
 app.get('/register', (req, res) => {
-  // if user is logged in and tries to access register page, redirect to /urls
-  if (getCookie(req, users)) {
-    return res.redirect('/urls');
+  if (!req.session.userID) {
+    const templateVars = {
+      urls: urlDatabase,
+      email: undefined,
+      message: undefined,
+    };
+    res.render('register', templateVars);
   }
-  const templateVars = {
-    urls: urlDatabase,
-    email: undefined,
-    message: undefined,
-  };
-  // if user is not logged in, render register page
-  res.render('register', templateVars);
+  return res.redirect('/urls');
 });
 
+// GET for /login - if user is not logged in, render login page. Else, redirect to /urls
 app.get('/login', (req, res) => {
   // if user is logged in and tries to access login page, redirect to /urls
-  if (getCookie(req, users)) {
-    return res.redirect('/urls');
+  if (!req.session.userID) {
+    const templateVars = {
+      urls: urlDatabase,
+      email: undefined,
+      message: undefined
+    };
+    res.render('login', templateVars);
   }
-  const templateVars = {
-    urls: urlDatabase,
-    email: undefined,
-    message: undefined
-  };
-  res.render('login', templateVars);
+  return res.redirect('/urls');
 });
 
-// redirect user to long URL if it exists
+// GET for /u/ redirect user to long URL if it exists
 app.get('/u/:id',(req, res) => {
   // check if URL exists
   const urlFound = urlDatabase[req.params.id];
@@ -228,6 +227,8 @@ app.post('/register', (req, res) => {
   }
 
   // create new user object (userId, email, password)
+  // const salt = bcrypt.genSaltSync(10);
+  // const hashedPassword = bcrypt.hashSync(req.body.password, salt);
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
   const userID = generateRandomString();
   const newUser = {
@@ -245,6 +246,14 @@ app.post('/register', (req, res) => {
 // LOGIN POST route
 app.post('/login', (req, res) => {
   const user = getUserByEmail(req.body.email, users);
+  if (!user) {
+    const templateVars = {
+      message: 'Email or password is incorrect. Try again.',
+      email: undefined,
+    };
+    // if user with email can not be found, respond with 403 error
+    return res.status(403).render('login', templateVars);
+  }
   // iterate through users database to see if email matches
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
   if (getUserByEmail(req.body.email, users) && bcrypt.compareSync(req.body.password, hashedPassword)) {
@@ -253,20 +262,13 @@ app.post('/login', (req, res) => {
     // send user to /urls
     return res.redirect('/urls');
   }
-  const templateVars = {
-    message: 'Email or password is incorrect. Try again.',
-    email: undefined,
-  };
-  // if user with email can not be found, respond with 403
-  console.log(`email ${req.body.email} NOT found`);
-  return res.status(403).render('login', templateVars);
 });
 
 // LOGOUT POST route
 app.post('/logout', (req, res) => {
   // remove the cookie using the cookie name
-  res.clearCookie('session');
-  res.clearCookie('session.sig');
+  req.session = null;
+
   res.redirect('/login');
 });
 
