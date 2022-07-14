@@ -68,13 +68,11 @@ const generateRandomString = () => {
   return randomString;
 };
 
-// user lookup helper function, checks email and password
-const userLookup = (email, password) => {
+// user lookup helper function, checks email
+const userLookup = (email) => {
   for (let user in users) {
     const enteredEmail = users[user].email;
-    const enteredPassword = users[user].password;
-
-    if (enteredEmail === email && enteredPassword === password) {
+    if (enteredEmail === email) {
       return users[user];
     }
   }
@@ -256,7 +254,7 @@ app.post('/register', (req, res) => {
   }
 
   // check if email is already in use
-  if (!userLookup(req.body.email)) {
+  if (userLookup(req.body.email)) {
     console.log('email is already in use: ', req.body.email);
     const templateVars = {
       email: undefined,
@@ -282,7 +280,8 @@ app.post('/register', (req, res) => {
 // LOGIN POST route
 app.post('/login', (req, res) => {
   // iterate through users database to see if email matches
-  if (userLookup(req.body.email, req.body.password)) {
+  const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+  if (userLookup(req.body.email) && bcrypt.compareSync(req.body.password, hashedPassword)) {
     // if email & password match, set cookie for user
     res.cookie('user_id', userLookup(req.body.email, req.body.password).id);
     // send user to /urls
