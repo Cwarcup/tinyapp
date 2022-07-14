@@ -2,7 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const app = express();
 const PORT = 8080; // default port 8080
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 
 // add in EJS middleware
@@ -11,8 +11,10 @@ app.set('view engine', 'ejs');
 // use middleware
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key'],
+}));
 //////////////// data /////////////////////
 // URL database
 const urlDatabase = {
@@ -70,18 +72,18 @@ const generateRandomString = () => {
 
 // user lookup helper function, checks email
 const userLookup = (email) => {
-  for (let user in users) {
-    const enteredEmail = users[user].email;
-    if (enteredEmail === email) {
+  for (const user in users) {
+    if (users[user].email === email) {
       return users[user];
     }
   }
-  return null;
+  return undefined;
 };
+
 
 // check if browser has cookie with user id
 const checkCookie = (req) => {
-  const cookie = req.cookies.user_id;
+  const cookie = req.session.userID;
   if (cookie) {
     return users[cookie];
   }
@@ -152,7 +154,7 @@ app.get('/urls/new', (req, res) => {
   if (checkCookie(req)) {
     const templateVars = {
       urls: urlDatabase,
-      email: users[req.cookies.user_id].email
+      email: users[req.session.userID].email
     };
     res.render('urls_new', templateVars);
   }
@@ -207,13 +209,13 @@ app.get('/urls', (req, res) => {
   }
 
   //get URLs for specific user
-  const userUrls = urlsForUser(req.cookies.user_id, urlDatabase);
+  const userUrls = urlsForUser(req.session.userID, urlDatabase);
 
   // if user is logged in, pass data with users object
   const templateVars = {
     isLoggedIn: true,
     urls: userUrls,
-    email: users[req.cookies.user_id].email,
+    email: users[req.session.userID].email,
   };
   // render page with data from users object
   return res.render('urls_index', templateVars);
@@ -224,12 +226,12 @@ app.get('/urls', (req, res) => {
 app.get('/', (req, res) => {
   // if user is logged in, pass data with users object
   if (checkCookie(req)) {
-    const userUrls = urlsForUser(req.cookies.user_id, urlDatabase);
+    const userUrls = urlsForUser(req.session.userID, urlDatabase);
 
     const templateVars = {
       isLoggedIn: true,
       urls: userUrls,
-      email: users[req.cookies.user_id].email,
+      email: users[req.session.userID].email,
       message: undefined,
     };
     // render page with data from users object
@@ -243,6 +245,7 @@ app.get('/', (req, res) => {
 
 // REGISTER POST route
 app.post('/register', (req, res) => {
+
   // check if email is empty string, 404 error
   if (req.body.email === '') {
     console.log('email is empty: ', req.body.email);
@@ -265,15 +268,16 @@ app.post('/register', (req, res) => {
 
   // create new user object (userId, email, password)
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+  const userID = generateRandomString();
   const newUser = {
-    id: generateRandomString(),
+    id: userID,
     email: req.body.email,
     password: hashedPassword
   };
   // add newUser to users database
   users[newUser.id] = newUser;
   // set cookie for new user using newUser.id
-  res.cookie('user_id', newUser.id);
+  req.session.userID = userID;
   res.redirect('/urls');
 });
 
@@ -283,7 +287,7 @@ app.post('/login', (req, res) => {
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
   if (userLookup(req.body.email) && bcrypt.compareSync(req.body.password, hashedPassword)) {
     // if email & password match, set cookie for user
-    res.cookie('user_id', userLookup(req.body.email, req.body.password).id);
+    req.session.userID = userLookup(req.body.email).id;
     // send user to /urls
     return res.redirect('/urls');
   }
@@ -299,7 +303,8 @@ app.post('/login', (req, res) => {
 // LOGOUT POST route
 app.post('/logout', (req, res) => {
   // remove the cookie using the cookie name
-  res.clearCookie('user_id');
+  res.clearCookie('session');
+  res.clearCookie('session.sig');
   res.redirect('/login');
 });
 
@@ -315,7 +320,7 @@ app.post('/urls', (req, res) => {
   // add new shortURL to urlDatabase
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
-    userID: req.cookies.user_id
+    userID: req.session.userID
   };
   // redirect to new shortURL page
   res.redirect('/urls');
@@ -335,7 +340,7 @@ app.post('/urls/:id/delete', (req, res) => {
   }
 
   // check if user has access to delete URL (own the URL)
-  if (urlDatabase[req.params.id].userID !== req.cookies.user_id) {
+  if (urlDatabase[req.params.id].userID !== req.session.userID) {
     console.log('You do not have access to delete this URL.');
     return res.status(403).redirect('/urls');
   }
@@ -361,7 +366,7 @@ app.post('/urls/:id', (req, res) => {
     return res.status(401).redirect('/login');
   }
   // check if user has access to edit URL (own the URL)
-  if (urlDatabase[req.params.id].userID !== req.cookies.user_id) {
+  if (urlDatabase[req.params.id].userID !== req.session.userID) {
     console.log('You do not have access to edit this URL.');
     return res.status(403).redirect('/urls');
   }
