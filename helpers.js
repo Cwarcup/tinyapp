@@ -1,9 +1,7 @@
 //////////// helper functions //////////////
+
 // generate random string
-const generateRandomString = () => {
-  const randomString = Math.random().toString(36).substring(7);
-  return randomString;
-};
+const generateRandomString = () =>  Math.random().toString(36).substring(7);
 
 // user lookup helper function, checks email
 const getUserByEmail = (email, database) => {
@@ -17,7 +15,7 @@ const getUserByEmail = (email, database) => {
 
 
 // check if browser has cookie with user id
-const checkCookie = (req, database) => {
+const getCookie = (req, database) => {
   const cookie = req.session.userID;
   if (cookie) {
     return database[cookie];
@@ -36,4 +34,4 @@ const urlsForUser = (id, urlDatabase) => {
   return userUrls;
 };
 
-module.exports = { generateRandomString, getUserByEmail, checkCookie, urlsForUser };
+module.exports = { generateRandomString, getUserByEmail, getCookie, urlsForUser };
