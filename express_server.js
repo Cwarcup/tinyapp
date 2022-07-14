@@ -300,7 +300,7 @@ app.post('/login', (req, res) => {
 app.post('/logout', (req, res) => {
   // remove the cookie using the cookie name
   res.clearCookie('user_id');
-  res.redirect('/urls');
+  res.redirect('/login');
 });
 
 // URLS homepage POST route
