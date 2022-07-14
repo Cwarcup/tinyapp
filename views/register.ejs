@@ -24,9 +24,9 @@
           <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col-12 col-md-9 col-lg-7 col-xl-6">
             <!-- section for if not logged in -->
-            <% if (message) { %>
+            <% if (errorMessage) { %>
               <div class="alert alert-danger" role="alert">
-                <%= message %>
+                <%= errorMessage %>
               </div>
             <% } %>
               <div class="card" style="border-radius: 15px;">
