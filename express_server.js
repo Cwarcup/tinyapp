@@ -15,56 +15,14 @@ app.use(cookieSession({
   name: 'session',
   keys: ['key'],
 }));
-//////////////// data /////////////////////
-const urlDatabase = {
-  b6UTxQ: {
-    longURL: 'https://www.tsn.ca',
-    userID: 'userRandomID',
-  },
-  i3BoGr: {
-    longURL: 'https://www.google.ca',
-    userID: 'cw',
-  },
-  lgLjZx: {
-    longURL: 'https://www.yahoo.ca',
-    userID: 'user2RandomID',
-  },
-  kjbk: {
-    longURL: 'https://www.facebook.com',
-    userID: 'cw',
-  },
-  sdfs: {
-    longURL: 'https://www.facebook.com/sdfsad',
-    userID: 'cw',
-  },
-  sgq3y6: {
-    longURL: 'https://www.google.com/images',
-    userID: 'a',
-  }
-};
 
-// object to store known users
-const users = {
-  userRandomID: {
-    id: 'userRandomID',
-    email: 'user@example.com',
-    password: 'purple-monkey-dinosaur',
-  },
-  user2RandomID: {
-    id: 'user2RandomID',
-    email: 'user2@example.com',
-    password: 'dishwasher-funk',
-  },
-  cw: {
-    id: 'cw',
-    email: 'cw@email.com',
-    password: 'cw',
-  }
-};
+const urlDatabase = {};
+
+const users = {};
 
 const { generateRandomString, getUserByEmail, checkCookie, urlsForUser } = require('./helpers');
 
-//////////   GET ROUTES   //////////
+////////////////////////////////// GET routes ////////////////////////////////
 
 // GET for /register
 app.get('/register', (req, res) => {
@@ -82,6 +40,7 @@ app.get('/register', (req, res) => {
   return res.render('register', templateVars);
 });
 
+// GET /login
 app.get('/login', (req, res) => {
   // if user is logged in and tries to access login page, redirect to /urls
   if (checkCookie(req, users)) {
@@ -92,13 +51,13 @@ app.get('/login', (req, res) => {
     email: undefined,
     errorMessage: undefined
   };
-  res.render('login', templateVars);
+  return res.render('login', templateVars);
 });
 
-// redirect user to long URL if it exists
+// GET /u/:id
 app.get('/u/:id',(req, res) => {
-  // check if URL exists
   const urlFound = urlDatabase[req.params.id];
+
   // if URL does not exist, it will be undefined
   if (urlFound === undefined) {
     const templateVars = {
@@ -106,14 +65,13 @@ app.get('/u/:id',(req, res) => {
       email: undefined,
       errorMessage: 'URL not found'
     };
-    // render the generic error page
     return res.status(404).render('urls_notFound', templateVars);
   }
   // if it does, sent user to long URL
-  res.redirect(urlFound.longURL);
+  return res.redirect(urlFound.longURL);
 });
 
-// route to create a new short URL
+// GET /urls/new
 app.get('/urls/new', (req, res) => {
   // if user is logged in, pass data with users object
   if (checkCookie(req, users)) {
@@ -121,28 +79,26 @@ app.get('/urls/new', (req, res) => {
       urls: urlDatabase,
       email: users[req.session.userID].email
     };
-    res.render('urls_new', templateVars);
+    return res.render('urls_new', templateVars);
   }
   // if user is not logged in, redirect to login page
-  res.redirect('/login');
+  return res.redirect('/login');
 });
 
-// GET for editing a URL
+// GET /urls/:id
 app.get('/urls/:id', (req, res) => {
-  // if user is not logged in OR URL does not exist, OR URL does
-  // CHECK IN DATABSE if URL exists
+  // check for valid URL ID
   if (!urlDatabase[req.params.id]) {
     const templateVars = {
       id: req.params.id,
       email: undefined,
       errorMessage: 'URL does not exist or you do not have access to edit it.'
     };
-    res.status(404).render('urls_notFound', templateVars);
+    return res.status(404).render('urls_notFound', templateVars);
   }
 
-  // check to see if user is logged in/has cookie
-  const cookie = checkCookie(req, users);
   //if user is not logged in
+  const cookie = checkCookie(req, users);
   if (!cookie) {
     // redirect to login page
     const templateVars = {
@@ -153,16 +109,15 @@ app.get('/urls/:id', (req, res) => {
     return res.status(401).render('login', templateVars);
   }
 
-  // check that short URL exists and userID in urlDatabase matches cookie id
   const templateVars = {
     id: req.params.id,
     longURL: urlsForUser(cookie.id, urlDatabase)[req.params.id],
     email: cookie.email,
   };
-  res.render('urls_show', templateVars);
+  return res.render('urls_show', templateVars);
 });
 
-// route to render "/urls" page
+// GET /urls - shows all URLs for logged in user
 app.get('/urls', (req, res) => {
   const userID = req.session.userID;
   const userURLs = urlsForUser(userID, urlDatabase);
@@ -177,14 +132,12 @@ app.get('/urls', (req, res) => {
     urls: userURLs,
     email: users[req.session.userID].email,
   };
-  // render page with data from users object
   return res.render('urls_index', templateVars);
 });
 
-// home page route
+// GET / home page
 app.get('/', (req, res) => {
   const userID = req.session.userID;
-  const userURLs = urlsForUser(userID, urlDatabase);
 
   if (!userID) {
     return res.redirect('/login');
@@ -193,7 +146,8 @@ app.get('/', (req, res) => {
   }
 });
 
-///////////////// POST routes ///////////////
+
+////////////////////////////////// POST routes ////////////////////////////////
 
 // REGISTER POST route
 app.post('/register', (req, res) => {
@@ -300,7 +254,7 @@ app.post('/urls/:id/delete', (req, res) => {
   return res.redirect('/urls');
 });
 
-// EDIT POST route to handle updates to long URL
+// POST /urls/:id - updates to long URL from urls_show
 app.post('/urls/:id', (req, res) => {
   if (urlDatabase[req.params.id] === undefined) {
     // if short URL does not exist, redirect to urls_index page
@@ -315,20 +269,7 @@ app.post('/urls/:id', (req, res) => {
   if (urlDatabase[req.params.id].userID !== req.session.userID) {
     return res.status(403).redirect('/urls');
   }
-  return res.redirect(`/urls/${req.params.id}`);
-});
-
-// UPDATE POST route to handle updates to long URL
-// accessible from /urls/:id page, update btn
-app.post('/urls/:id', (req, res) => {
-  // check if user logged in / has cookie
-  if (!checkCookie(req, users)) {
-    // if user is not logged in, redirect to login page
-    return res.status(401).redirect('/login');
-  }
-  // update longURL in urlDatabase
   urlDatabase[req.params.id].longURL = req.body.longURL;
-  // redirect to urls_index page
   return res.redirect(`/urls/${req.params.id}`);
 });
 
