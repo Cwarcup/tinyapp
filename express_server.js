@@ -185,7 +185,7 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 });
 
-// LOGIN POST route
+// POST /login
 app.post('/login', (req, res) => {
   const user = getUserByEmail(req.body.email, users);
 
@@ -204,7 +204,7 @@ app.post('/login', (req, res) => {
   return res.status(403).render('login', templateVars);
 });
 
-// LOGOUT POST route
+// POST /logout
 app.post('/logout', (req, res) => {
   // remove the cookie using the cookie name
   res.clearCookie('session');
@@ -212,14 +212,13 @@ app.post('/logout', (req, res) => {
   res.redirect('/login');
 });
 
-// URLS homepage POST route
-// POST method to receive the form data from urls_new
+// POST /urls - method to receive the form data from urls_new
 app.post('/urls', (req, res) => {
   const userID = req.session.userID;
   const user = users[userID];
   // either have or DONT have user (undefined)
   if (!user) {
-    return res.send('you are not logged in');
+    return res.send('You are not logged in');
   }
 
   const shortURL = generateRandomString();
@@ -232,12 +231,13 @@ app.post('/urls', (req, res) => {
   return res.redirect('/urls');
 });
 
-// DELETE POST route - delete a URL from the database
+// POST /urls/:id/delete - delete a URL from the database
 app.post('/urls/:id/delete', (req, res) => {
+  // if short URL does not exist, redirect to urls_index page
   if (urlDatabase[req.params.id] === undefined) {
-    // if short URL does not exist, redirect to urls_index page
     return res.status(404).redirect('/urls');
   }
+
   // if user is not logged in, redirect to login page
   if (!checkCookie(req, users)) {
     return res.status(403).redirect('/login');
@@ -250,7 +250,6 @@ app.post('/urls/:id/delete', (req, res) => {
 
   // delete shortURL from urlDatabase
   delete urlDatabase[req.params.id];
-  // redirect to urls_index page
   return res.redirect('/urls');
 });
 
