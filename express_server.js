@@ -64,48 +64,14 @@ const users = {
   }
 };
 //////////// helper functions //////////////
-// generate random string
-const generateRandomString = () => {
-  const randomString = Math.random().toString(36).substring(7);
-  return randomString;
-};
 
-// user lookup helper function, checks email
-const getUserByEmail = (email, database) => {
-  for (const user in database) {
-    if (database[user].email === email) {
-      return database[user];
-    }
-  }
-  return undefined;
-};
-
-
-// check if browser has cookie with user id
-const checkCookie = (req) => {
-  const cookie = req.session.userID;
-  if (cookie) {
-    return users[cookie];
-  }
-  return null;
-};
-
-// filter URLdatabase and return only URLs that belong to user
-const urlsForUser = (id, urlDatabase) => {
-  const userUrls = {};
-  for (let shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userID === id) {
-      userUrls[shortURL] = urlDatabase[shortURL].longURL;
-    }
-  }
-  return userUrls;
-};
+const { generateRandomString, getUserByEmail, checkCookie, urlsForUser } = require('./helpers');
 
 //////////   GET ROUTES   //////////
 // GET for /register
 app.get('/register', (req, res) => {
   // if user is logged in and tries to access register page, redirect to /urls
-  if (checkCookie(req)) {
+  if (checkCookie(req, users)) {
     return res.redirect('/urls');
   }
   const templateVars = {
@@ -119,7 +85,7 @@ app.get('/register', (req, res) => {
 
 app.get('/login', (req, res) => {
   // if user is logged in and tries to access login page, redirect to /urls
-  if (checkCookie(req)) {
+  if (checkCookie(req, users)) {
     return res.redirect('/urls');
   }
   const templateVars = {
@@ -151,7 +117,7 @@ app.get('/u/:id',(req, res) => {
 // route to create a new short URL
 app.get('/urls/new', (req, res) => {
   // if user is logged in, pass data with users object
-  if (checkCookie(req)) {
+  if (checkCookie(req, users)) {
     const templateVars = {
       urls: urlDatabase,
       email: users[req.session.userID].email
@@ -165,7 +131,7 @@ app.get('/urls/new', (req, res) => {
 // GET for editing a URL
 app.get('/urls/:id', (req, res) => {
   // check to see if user is logged in/has cookie
-  const cookie = checkCookie(req);
+  const cookie = checkCookie(req, users);
   //if user is not logged in
   if (!cookie) {
     // redirect to login page
@@ -197,7 +163,7 @@ app.get('/urls/:id', (req, res) => {
 
 // route to render "/urls" page
 app.get('/urls', (req, res) => {
-  if (!checkCookie(req)) {
+  if (!checkCookie(req, users)) {
     // if user is not logged in, redirect to login page
     const templateVars = {
       isLoggedIn: false,
@@ -225,7 +191,7 @@ app.get('/urls', (req, res) => {
 // home page route
 app.get('/', (req, res) => {
   // if user is logged in, pass data with users object
-  if (checkCookie(req)) {
+  if (checkCookie(req, users)) {
     const userUrls = urlsForUser(req.session.userID, urlDatabase);
 
     const templateVars = {
@@ -312,7 +278,7 @@ app.post('/logout', (req, res) => {
 // URLS homepage POST route
 // POST method to receive the form data from urls_new
 app.post('/urls', (req, res) => {
-  if (!checkCookie(req)) {
+  if (!checkCookie(req, users)) {
     // if user is not logged in, redirect to login page
     return res.send('user is not logged in').redirect('/login');
   }
@@ -335,7 +301,7 @@ app.post('/urls/:id/delete', (req, res) => {
     return res.status(404).redirect('/urls');
   }
   // if user is not logged in, redirect to login page
-  if (!checkCookie(req)) {
+  if (!checkCookie(req, users)) {
     console.log('Please log in to delete a URL.');
     return res.status(403).redirect('/login');
   }
@@ -361,7 +327,7 @@ app.post('/urls/:id', (req, res) => {
     return res.status(404).redirect('/urls');
   }
   // check if user logged in / has cookie
-  if (!checkCookie(req)) {
+  if (!checkCookie(req, users)) {
     // if user is not logged in, redirect to login page
     console.log('Please log in to edit a URL.');
     return res.status(401).redirect('/login');
@@ -378,7 +344,7 @@ app.post('/urls/:id', (req, res) => {
 // accessible from /urls/:id page, update btn
 app.post('/urls/:id/update', (req, res) => {
   // check if user logged in / has cookie
-  if (!checkCookie(req)) {
+  if (!checkCookie(req, users)) {
     // if user is not logged in, redirect to login page
     return res.status(401).redirect('/login');
   }
