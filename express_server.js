@@ -163,29 +163,22 @@ app.get('/urls/:id', (req, res) => {
 
 // route to render "/urls" page
 app.get('/urls', (req, res) => {
-  if (!checkCookie(req, users)) {
-    // if user is not logged in, redirect to login page
-    const templateVars = {
-      isLoggedIn: false,
-      urls: urlDatabase,
-      email: undefined,
-      message: 'You must be logged in to view URLs. Please log in or register.'
-    };
-    return res.render('urls_index', templateVars);
-  }
+  const userID = req.session.userID;
+  const userURLs = urlsForUser(userID, urlDatabase);
 
-  //get URLs for specific user
-  const userUrls = urlsForUser(req.session.userID, urlDatabase);
+  if (!userID) {
+    const templateVars = { errorMessage: 'please log in'};
+    return res.status(401).render('urls_notFound', templateVars);
+  }
 
   // if user is logged in, pass data with users object
   const templateVars = {
     isLoggedIn: true,
-    urls: userUrls,
+    urls: userURLs,
     email: users[req.session.userID].email,
   };
   // render page with data from users object
   return res.render('urls_index', templateVars);
-  
 });
 
 // home page route
@@ -278,12 +271,15 @@ app.post('/logout', (req, res) => {
 // URLS homepage POST route
 // POST method to receive the form data from urls_new
 app.post('/urls', (req, res) => {
-  if (!checkCookie(req, users)) {
-    // if user is not logged in, redirect to login page
-    return res.send('user is not logged in').redirect('/login');
+  const userID = req.session.userID;
+  const user = users[userID];
+  // either have or DONT have user (undefined)
+  if (!user) {
+    return res.send('you are not logged in');
   }
+  console.log('user: ', user);
+
   const shortURL = generateRandomString();
-  console.log('long URL: ', req.body.longURL);
   // add new shortURL to urlDatabase
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
