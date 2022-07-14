@@ -25,7 +25,7 @@ const getCookie = (req, database) => {
 
 // filter URLdatabase and return only URLs that belong to user
 const urlsForUser = (id, urlDatabase) => {
-  const userUrls = {};
+  let userUrls = {};
   for (let shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === id) {
       userUrls[shortURL] = urlDatabase[shortURL].longURL;
