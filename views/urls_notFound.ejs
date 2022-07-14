@@ -22,8 +22,8 @@
         <p class="card-text">
           The URL ID: <a href="/u/<%= id %>"><%= id %></a> is not found
         </p>
-        <% if (message) { %>
-          <p><%= message %></p>
+        <% if (errorMsg) { %>
+          <p><%= errorMsg %></p>
         <% } %>
         <p>Try a different short URL</p>
         </div>

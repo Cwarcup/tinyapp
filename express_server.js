@@ -78,7 +78,7 @@ app.get('/register', (req, res) => {
     const templateVars = {
       urls: urlDatabase,
       email: undefined,
-      message: undefined,
+      errorMsg: undefined,
     };
     res.render('register', templateVars);
   }
@@ -88,47 +88,52 @@ app.get('/register', (req, res) => {
 // GET for /login - if user is not logged in, render login page. Else, redirect to /urls
 app.get('/login', (req, res) => {
   // if user is logged in and tries to access login page, redirect to /urls
-  if (!req.session.userID) {
+  console.log(req.session.userID);
+  if (req.session.userID === undefined) {
     const templateVars = {
       urls: urlDatabase,
       email: undefined,
-      message: undefined
+      errorMsg: undefined
     };
-    res.render('login', templateVars);
+    return res.status(400).render('login', templateVars);
   }
-  return res.redirect('/urls');
+  const templateVars = {
+    urls: urlDatabase,
+    email: users[req.session.userID].email,
+    errorMsg: undefined
+  };
+  return res.render('index_urls', templateVars);
 });
 
-// GET for /u/ redirect user to long URL if it exists
-app.get('/u/:id',(req, res) => {
-  // check if URL exists
+// GET for /u/:id - redirect user to long URL if it exists. Else, redirect to urls_notFound view
+app.get('/u/:id', (req, res) => {
   const urlFound = urlDatabase[req.params.id];
-  // if URL does not exist, it will be undefined
+
   if (urlFound === undefined) {
     const templateVars = {
       id: req.params.id,
       email: undefined,
-      message: undefined
+      errorMsg: undefined
     };
-    // render the generic error page
     return res.status(404).render('urls_notFound', templateVars);
   }
-  // if it does, sent user to long URL
   res.redirect(urlFound.longURL);
 });
 
-// route to create a new short URL
+// GET for /urls/new - route to create a new short URL
 app.get('/urls/new', (req, res) => {
-  // if user is logged in, pass data with users object
-  if (getCookie(req, users)) {
-    const templateVars = {
-      urls: urlDatabase,
-      email: users[req.session.userID].email
-    };
-    res.render('urls_new', templateVars);
-  }
   // if user is not logged in, redirect to login page
-  res.redirect('/login');
+  console.log('req.session.userID:', req.session.userID);
+  if (!req.session.userID) {
+    return res.redirect('/login');
+  }
+  console.log('req.session.userID: ', req.session.userID);
+  console.log('user database: ', users);
+  const templateVars = {
+    urls: urlDatabase,
+    email: users[req.session.userID]
+  };
+  res.render('urls_new', templateVars);
 });
 
 // GET for editing a URL
@@ -141,7 +146,7 @@ app.get('/urls/:id', (req, res) => {
     const templateVars = {
       id: req.params.id,
       email: undefined,
-      message: 'You must be logged in to view this page'
+      errorMsg: 'You must be logged in to view this page'
     };
     return res.status(401).render('login', templateVars);
   }
@@ -150,7 +155,7 @@ app.get('/urls/:id', (req, res) => {
     const templateVars = {
       id: req.params.id,
       email: undefined,
-      message: 'URL does not exist or you do not have access to edit it.'
+      errorMsg: 'URL does not exist or you do not have access to edit it.'
     };
     res.status(404).render('urls_notFound', templateVars);
   }
@@ -166,13 +171,24 @@ app.get('/urls/:id', (req, res) => {
 
 // route to render "/urls" page
 app.get('/urls', (req, res) => {
-  if (!getCookie(req, users)) {
+  const userID = req.session.userID;
+  const user = users[userID];
+  // either have or DONT have user (undefined)
+  if (!user) {
+    res.send('you are not logged in');
+    return;
+  }
+
+
+
+  console.log('req.session.userID:', req.session.userID);
+  if (!req.session.userID) {
     // if user is not logged in, redirect to login page
     const templateVars = {
       isLoggedIn: false,
       urls: urlDatabase,
       email: undefined,
-      message: 'You must be logged in to view URLs. Please log in or register.'
+      errorMsg: 'You must be logged in to view URLs. Please log in or register.'
     };
     return res.render('urls_index', templateVars);
   }
@@ -182,7 +198,6 @@ app.get('/urls', (req, res) => {
 
   // if user is logged in, pass data with users object
   const templateVars = {
-    isLoggedIn: true,
     urls: userUrls,
     email: users[req.session.userID].email,
   };
@@ -205,50 +220,44 @@ app.get('/', (req, res) => {
 
 // REGISTER POST route
 app.post('/register', (req, res) => {
-
-  // check if email is empty string, 404 error
-  if (req.body.email === '') {
-    console.log('email is empty: ', req.body.email);
+  // check form is not empty string
+  if (req.body.email && req.body.password) {
+    // check if email is NOT in use
+    if (!getUserByEmail(req.body.email, users)) {
+      // happy path
+      // create new user and add to users object
+      const userID = generateRandomString();
+      users[userID] = {
+        userID: userID,
+        email: req.body.email,
+        password: bcrypt.hashSync(req.body.password, 10)
+      };
+      req.session.userID = userID;
+      console.log('users: ', users);
+      return res.redirect('/urls');
+    }
+    // if email is in use, redirect to register page with error errorMsg
     const templateVars = {
+      errorMsg: `Email ${req.body.email} is already in use. Please try another email.`,
       email: undefined,
-      message: 'Email cannot be empty. Please enter a valid email.'
     };
     return res.status(400).render('register', templateVars);
   }
-
-  // check if email is already in use
-  if (getUserByEmail(req.body.email, users)) {
-    console.log('email is already in use: ', req.body.email);
-    const templateVars = {
-      email: undefined,
-      message: 'email is already in use. Please enter a different email.'
-    };
-    return res.status(400).render('register', templateVars);
-  }
-
-  // create new user object (userId, email, password)
-  // const salt = bcrypt.genSaltSync(10);
-  // const hashedPassword = bcrypt.hashSync(req.body.password, salt);
-  const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-  const userID = generateRandomString();
-  const newUser = {
-    id: userID,
-    email: req.body.email,
-    password: hashedPassword
+  // if form is empty, redirect to register page with error errorMsg
+  const templateVars = {
+    errorMsg: 'Please enter an email and password.',
+    email: undefined,
   };
-  // add newUser to users database
-  users[newUser.id] = newUser;
-  // set cookie for new user using newUser.id
-  req.session.userID = userID;
-  res.redirect('/urls');
+  return res.status(400).render('register', templateVars);
 });
 
 // LOGIN POST route
 app.post('/login', (req, res) => {
   const user = getUserByEmail(req.body.email, users);
-  if (!user) {
+  console.log('user: ', user);
+  if (user === undefined) {
     const templateVars = {
-      message: 'Email or password is incorrect. Try again.',
+      errorMsg: 'Email or password is incorrect. Try again.',
       email: undefined,
     };
     // if user with email can not be found, respond with 403 error
@@ -256,11 +265,10 @@ app.post('/login', (req, res) => {
   }
   // iterate through users database to see if email matches
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-  if (getUserByEmail(req.body.email, users) && bcrypt.compareSync(req.body.password, hashedPassword)) {
+  if (bcrypt.compareSync(req.body.password, hashedPassword)) {
     // if email & password match, set cookie for user
     req.session.userID = user.id;
-    // send user to /urls
-    return res.redirect('/urls');
+    res.redirect('/urls');
   }
 });
 
@@ -279,10 +287,10 @@ app.post('/urls', (req, res) => {
     // if user is not logged in, redirect to login page
     return res.send('user is not logged in').redirect('/login');
   }
-  const shortURL = generateRandomString();
+  const id = generateRandomString();
   console.log('long URL: ', req.body.longURL);
   // add new shortURL to urlDatabase
-  urlDatabase[shortURL] = {
+  urlDatabase[id] = {
     longURL: req.body.longURL,
     userID: req.session.userID
   };

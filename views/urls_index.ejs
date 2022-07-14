@@ -26,9 +26,9 @@
           <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col-12 col-md-9 col-lg-7 col-xl-6">
               <!-- section for if not logged in -->
-              <% if (message) { %>
+              <% if (errorMsg) { %>
                 <div class="alert alert-danger text-center" role="alert">
-                  <%= message %>
+                  <%= errorMsg %>
                 </div>
               <% } %>
               </div>
