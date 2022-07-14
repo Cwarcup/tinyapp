@@ -167,14 +167,13 @@ app.get('/urls', (req, res) => {
   const userID = req.session.userID;
   const userURLs = urlsForUser(userID, urlDatabase);
 
-  if (!userID) {
+  if (!userID || users[req.session.userID] === undefined) {
     const templateVars = { errorMessage: 'please log in'};
     return res.status(401).render('urls_notFound', templateVars);
   }
 
   // if user is logged in, pass data with users object
   const templateVars = {
-    isLoggedIn: true,
     urls: userURLs,
     email: users[req.session.userID].email,
   };

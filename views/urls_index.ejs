@@ -20,25 +20,6 @@
   <body>
     <%- include('partials/_header') %>
     <main style="margin: 1em;">
-      <!-- section for if not logged in -->
-      <% if (!isLoggedIn) { %>
-        <div class="container h-100">
-          <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col-12 col-md-9 col-lg-7 col-xl-6">
-              <!-- section for if not logged in -->
-              <% if (message) { %>
-                <div class="alert alert-danger text-center" role="alert">
-                  <%= message %>
-                </div>
-              <% } %>
-              </div>
-            </div>
-          </div>
-      <% } %>
-
-      <!-- if user is logged in, display URLS -->
-      <% if (isLoggedIn) { %>
-
         <h3>My URLs</h3>
         <table class="table">
           <thead>
@@ -69,7 +50,6 @@
               <% } %>
             </tbody>
           </table>
-          <% } %>
     </main>
     <!-- Bootstrap JS -->
     <script
