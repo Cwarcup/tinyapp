@@ -5,18 +5,18 @@ const PORT = 8080; // default port 8080
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 
-// add in EJS middleware
+// EJS middleware
 app.set('view engine', 'ejs');
 
-// use middleware
+// middleware
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
-  keys: ['key'],
+  keys: ['super-secret-key'],
 }));
-//////////////// data /////////////////////
-// URL database
+
+//////////////// TEST DATA /////////////////////
 const urlDatabase = {
   b6UTxQ: {
     longURL: 'https://www.tsn.ca',
@@ -45,7 +45,6 @@ const urlDatabase = {
 
 };
 
-// user database
 const users = {
   userRandomID: {
     id: 'userRandomID',
@@ -61,10 +60,15 @@ const users = {
     id: 'cw',
     email: 'cw@email.com',
     password: 'cw',
+  },
+  a: {
+    id: 'a',
+    email: 'a@a.com',
+    password: 'a',
   }
 };
-//////////// helper functions //////////////
 
+//////////// helper functions //////////////
 const { generateRandomString, getUserByEmail, getCookie, urlsForUser } = require('./helpers');
 
 //////////   GET ROUTES   //////////
@@ -188,22 +192,13 @@ app.get('/urls', (req, res) => {
   
 });
 
-// home page route
+// GET - root
+// if user is logged in, redirect to /urls
+// if user is not logged in, redirect to /login
 app.get('/', (req, res) => {
-  // if user is logged in, pass data with users object
-  if (getCookie(req, users)) {
-    const userUrls = urlsForUser(req.session.userID, urlDatabase);
-
-    const templateVars = {
-      isLoggedIn: true,
-      urls: userUrls,
-      email: users[req.session.userID].email,
-      message: undefined,
-    };
-    // render page with data from users object
-    return res.render('urls_index', templateVars);
+  if (req.session.userID) { // check for cookie
+    res.redirect('/urls');
   }
-  // if user is not logged in, redirect to login page
   res.redirect('/login');
 });
 
