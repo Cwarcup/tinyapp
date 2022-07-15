@@ -4,6 +4,7 @@ const app = express();
 const PORT = 8080; // default port 8080
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
+const methodOverride = require('method-override');
 
 // add in EJS middleware
 app.set('view engine', 'ejs');
@@ -15,6 +16,7 @@ app.use(cookieSession({
   name: 'session',
   keys: ['key'],
 }));
+app.use(methodOverride('_method'));
 
 const urlDatabase = {};
 
@@ -234,7 +236,7 @@ app.post('/urls', (req, res) => {
 });
 
 // POST /urls/:id/delete - delete a URL from the database
-app.post('/urls/:id/delete', (req, res) => {
+app.delete('/urls/:id', (req, res) => {
   // if short URL does not exist, redirect to urls_index page
   if (urlDatabase[req.params.id] === undefined) {
     return res.status(404).redirect('/urls');
