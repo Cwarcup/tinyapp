@@ -69,6 +69,16 @@ app.get('/u/:id',(req, res) => {
     };
     return res.status(404).render('urls_notFound', templateVars);
   }
+  const id = req.params.id;
+  // create a cookie for a unique id
+  if (!req.session.id) {
+    req.session.id = id;
+    urlDatabase[id].visits++;
+  }
+  req.session.id = id;
+  urlDatabase[id].visits++;
+  console.log(urlDatabase[req.params.id].visits);
+
   // if it does, sent user to long URL
   return res.redirect(urlFound.longURL);
 });
@@ -229,8 +239,10 @@ app.post('/urls', (req, res) => {
   // add new shortURL to urlDatabase
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
-    userID: req.session.userID
+    userID: req.session.userID,
+    visits: 0
   };
+  console.log(urlDatabase[shortURL].visits);
   // redirect to new shortURL page
   return res.redirect('/urls');
 });
