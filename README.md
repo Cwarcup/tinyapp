@@ -1,11 +1,24 @@
-# tinyApp URL Shortener
+# TinyApp Project
 
-In this exercise we learned how to use the EJS templating engine to render web pages.
+TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs (à la bit.ly).
 
-We used the Express render method to respond to requests by sending back a template, along with an object containing the data the template needs. We then used EJS to render this data to our web page. We used Express route parameters to pass data from our frontend to our backend via the request url. Finally, we created a partial template for our header so that we can have the code for it in one location, but render it on multiple pages.
+## Final Product
 
+![register page](public/images/register.png)
 
-### Learning Outcomes
-- Add route for /urls in expressserver.js and render using accompanying template
-- Add route for /urls/:id in expressserver.js and render using accompanying template
-- Include the header partial inside urls_index.ejs and urls_show.ejs. Make sure this is included inside the top of the **body**
+![edit a URL](https://media4.giphy.com/media/D4Czv7qV1fTkK24nru/giphy.gif?cid=790b761126f660eeead03d967701f06f3f4b18876af554f8&rid=giphy.gif&ct=g)
+
+![delete a URL](https://media3.giphy.com/media/CTlYtuUjS1UOy9dhhM/giphy.gif?cid=790b7611b464c985c3ff8e4d6a175bfc5dce191af1baf1b4&rid=giphy.gif&ct=g)
+
+## Dependencies
+
+- Node.js
+- Express
+- EJS
+- bcryptjs
+- cookie-session
+
+## Getting Started
+
+- Install all dependencies (using the `npm install` command).
+- Run the development web server using the `node express_server.js` command.
