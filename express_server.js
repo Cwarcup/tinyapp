@@ -87,10 +87,11 @@ app.get('/urls/new', (req, res) => {
 
 // GET /urls/:id
 app.get('/urls/:id', (req, res) => {
+  const id = req.params.id;
   // check for valid URL ID
-  if (!urlDatabase[req.params.id]) {
+  if (!urlDatabase[id]) {
     const templateVars = {
-      id: req.params.id,
+      id: id,
       email: undefined,
       errorMessage: 'URL does not exist or you do not have access to edit it.'
     };
@@ -98,11 +99,12 @@ app.get('/urls/:id', (req, res) => {
   }
 
   //if user is not logged in
-  const cookie = checkCookie(req, users);
-  if (!cookie) {
+  const userID = req.session.userID;
+  const userUrls = urlsForUser(userID, urlDatabase);
+  if (!userID || !userUrls[id]) {
     // redirect to login page
     const templateVars = {
-      id: req.params.id,
+      id: id,
       email: undefined,
       errorMessage: 'You must be logged in to view this page'
     };
@@ -110,9 +112,9 @@ app.get('/urls/:id', (req, res) => {
   }
 
   const templateVars = {
-    id: req.params.id,
-    longURL: urlsForUser(cookie.id, urlDatabase)[req.params.id],
-    email: cookie.email,
+    id: id,
+    longURL: userUrls[req.params.id],
+    email: users[userID].email
   };
   return res.render('urls_show', templateVars);
 });
