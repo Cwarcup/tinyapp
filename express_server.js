@@ -258,7 +258,7 @@ app.delete('/urls/:id', (req, res) => {
 });
 
 // POST /urls/:id - updates to long URL from urls_show
-app.post('/urls/:id', (req, res) => {
+app.put('/urls/:id', (req, res) => {
   if (urlDatabase[req.params.id] === undefined) {
     // if short URL does not exist, redirect to urls_index page
     return res.status(404).redirect('/urls');
