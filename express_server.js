@@ -19,18 +19,25 @@ app.use(cookieSession({
 app.use(methodOverride('_method'));
 
 const urlDatabase = {
-  'frwmsg': {
+  'abcd': {
     longURL: 'https://stackoverflow.com/questions/2281087/center-a-div-in-css',
-    userID: 'pczzd',
+    userID: 'test',
     uniqueVisits: 13,
     totalVisits: 22,
+    recentVisits: [ { 'timestamp': '2022-07-17T21:13:22.608Z', 'ip': '::ffff:10.0.2.2' } ]
+  },
+  'efgh': {
+    longURL: 'https://www.google.com/',
+    userID: 'test',
+    uniqueVisits: 230,
+    totalVisits: 950,
     recentVisits: [ { 'timestamp': '2022-07-17T21:13:22.608Z', 'ip': '::ffff:10.0.2.2' } ]
   }
 };
 
 const users = {
-  'pczzd': {
-    id: 'pczzd',
+  'test': {
+    id: 'test',
     email: 'test@email.com',
     password: '$2a$10$EJxCbYwb/Q0dQzGRPOWBP.oKzgpqvvWE3jWTrKo0h2tY72ht.K0ry'
   }
