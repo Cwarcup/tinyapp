@@ -18,11 +18,11 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-![register page](public/images/register.png)
+![login page](https://media3.giphy.com/media/cL7pKZUIpcivqdfPk4/giphy.gif?cid=790b7611f31a14d517a1b98da284dbafaac4232b75ef47a9&rid=giphy.gif&ct=g)
 
-![edit a URL](https://media4.giphy.com/media/D4Czv7qV1fTkK24nru/giphy.gif?cid=790b761126f660eeead03d967701f06f3f4b18876af554f8&rid=giphy.gif&ct=g)
+![edit a URL](https://media0.giphy.com/media/efqvBkCNNAPaJ3W4Dg/giphy.gif?cid=790b7611d031cc790a76413536d1070af325ac3ab0d2479a&rid=giphy.gif&ct=g)
 
-![delete a URL](https://media3.giphy.com/media/CTlYtuUjS1UOy9dhhM/giphy.gif?cid=790b7611b464c985c3ff8e4d6a175bfc5dce191af1baf1b4&rid=giphy.gif&ct=g)
+![errors](https://media0.giphy.com/media/sVHvhNtVfPDJ3V7BlZ/giphy.gif?cid=790b761157b1f94a67171b4f399c3ae28b5e50a51eee2525&rid=giphy.gif&ct=g)
 
 ## Dependencies
 
