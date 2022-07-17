@@ -34,6 +34,7 @@ const urlsForUser = (id, urlDatabase) => {
         'id': shortURL,
         'longURL': urlDatabase[shortURL].longURL,
         'uniqueVisits': urlDatabase[shortURL].uniqueVisits,
+        'totalVisits': urlDatabase[shortURL].totalVisits
       };
     }
   }

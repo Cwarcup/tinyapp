@@ -2,6 +2,18 @@
 
 TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs (à la bit.ly).
 
+# Features
+
+- Uses cookies to track user sessions
+- Built in analytics
+  - tracks the number of visits to a *unique* URL
+  - tracks *total* number of visits to a URL
+  - analytics are only visible to the user who created the URL
+- Permissions
+  - only a user that creates a URL has authorization to edit and delete it
+  - can only create a URL if they are logged in and registered with the site
+- Header contents are conditional on whether the user is logged in or not
+
 ## Final Product
 
 ![register page](public/images/register.png)

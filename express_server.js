@@ -77,8 +77,9 @@ app.get('/u/:id',(req, res) => {
     urlDatabase[id].uniqueVisits++;
   }
 
-  // increment the uniqueVisits for the shortURL
-  // urlDatabase[id].uniqueVisits++;
+  // increment the totalVisits for the in UrlDatabase
+  urlDatabase[id].totalVisits++;
+  
 
   // if it does, sent user to long URL
   return res.redirect(urlFound.longURL);
@@ -242,7 +243,8 @@ app.post('/urls', (req, res) => {
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
     userID: req.session.userID,
-    uniqueVisits: 0
+    uniqueVisits: 0,
+    totalVisits: 0
   };
 
   // redirect to new shortURL page
