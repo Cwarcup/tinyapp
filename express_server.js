@@ -31,7 +31,7 @@ const urlDatabase = {
     userID: 'test',
     uniqueVisits: 230,
     totalVisits: 950,
-    recentVisits: [ { 'timestamp': '2022-07-17T21:13:22.608Z', 'ip': '::ffff:10.0.2.2' } ]
+    recentVisits: [ { 'timestamp': new Date('2022-07-17T21:13:22.608Z'), 'ip': '::ffff:10.0.2.2' }, {'timestamp': new Date('2022-07-17T21:23:06.150Z'), 'ip': '::ffff:10.0.2.2'} ]
   }
 };
 
@@ -75,6 +75,32 @@ app.get('/login', (req, res) => {
     errorMessage: undefined
   };
   return res.render('login', templateVars);
+});
+
+// !! page for analytics
+// GET urls/analytics/:id
+app.get('/analytics/:id', (req, res) => {
+  // if user is not logged in, redirect to /login
+  if (!checkCookie(req, users)) {
+    return res.redirect('/login');
+  }
+  // if user is logged in, but does not own the shortURL, redirect to /urls
+  if (urlDatabase[req.params.id].userID !== req.session.userID) {
+    return res.redirect('/urls');
+  }
+  // if user is logged in and owns the shortURL, render analytics page
+  const userID = req.session.userID;
+  const userURLs = urlsForUser(userID, urlDatabase);
+
+  const templateVars = {
+    urls: userURLs[req.params.id],
+    shortURL: req.params.id,
+    user: users[userID],
+    email: users[userID].email,
+    errorMessage: undefined
+  };
+  console.log(templateVars);
+  return res.render('urls_analytics', templateVars);
 });
 
 // GET /u/:id
