@@ -84,7 +84,6 @@ app.get('/login', (req, res) => {
   return res.render('login', templateVars);
 });
 
-// !! page for analytics
 // GET urls/analytics/:id
 app.get('/analytics/:id', (req, res) => {
   // if user is not logged in, redirect to /login
@@ -106,7 +105,6 @@ app.get('/analytics/:id', (req, res) => {
     email: users[userID].email,
     errorMessage: undefined
   };
-  console.log(templateVars);
   return res.render('urls_analytics', templateVars);
 });
 
@@ -124,8 +122,8 @@ app.get('/u/:id',(req, res) => {
     return res.status(404).render('urls_notFound', templateVars);
   }
 
-  const id = req.params.id;
   // create a cookie for a unique id / shortURL
+  const id = req.params.id;
   if (!req.session.id) {
     req.session.id = id;
     urlDatabase[id].uniqueVisits++;
@@ -134,15 +132,12 @@ app.get('/u/:id',(req, res) => {
   // increment the totalVisits for the in UrlDatabase
   urlDatabase[id].totalVisits++;
 
-  // !! add timestamp to the UrlDatabase timestamp object
+  // update the recentVisits array in the UrlDatabase
   const userAccessed = {
     timestamp: new Date(),
     ip: req.ip
   };
   urlDatabase[id].recentVisits.push(userAccessed);
-  
-  console.log('url database after new entry', urlDatabase);
-  console.log('recent visits: ', urlDatabase[id].recentVisits);
 
   //  if it does, sent user to long URL
   return res.redirect(urlFound.longURL);
@@ -206,7 +201,6 @@ app.get('/urls', (req, res) => {
     return res.status(401).render('urls_notFound', templateVars);
   }
   
-  console.log('GET - /urls - user urls:', userURLs);
   // if user is logged in, pass data with users object
   const templateVars = {
     urls: userURLs,
@@ -258,7 +252,7 @@ app.post('/register', (req, res) => {
     email: req.body.email,
     password: hashedPassword
   };
-  console.log('hashed password: ', hashedPassword);
+
   // add newUser to users database
   users[newUser.id] = newUser;
   // set cookie for new user using newUser.id
