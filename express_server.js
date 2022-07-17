@@ -69,15 +69,17 @@ app.get('/u/:id',(req, res) => {
     };
     return res.status(404).render('urls_notFound', templateVars);
   }
+
   const id = req.params.id;
-  // create a cookie for a unique id
+  // create a cookie for a unique id / shortURL
   if (!req.session.id) {
     req.session.id = id;
     urlDatabase[id].visits++;
   }
-  req.session.id = id;
+
+  // increment the visits for the shortURL
   urlDatabase[id].visits++;
-  console.log(urlDatabase[req.params.id].visits);
+  console.log('short id visits:', urlDatabase[req.params.id].visits);
 
   // if it does, sent user to long URL
   return res.redirect(urlFound.longURL);
@@ -140,6 +142,18 @@ app.get('/urls', (req, res) => {
     const templateVars = { errorMessage: 'please log in'};
     return res.status(401).render('urls_notFound', templateVars);
   }
+  
+
+  // const analyticsForURL = (id, userURLs) => {
+  //   const analytics = {};
+  //   for (let shortURL in userURLs) {
+  //     if (urlDatabase[shortURL].userID === id) {
+  //       userUrls[shortURL] = urlDatabase[shortURL].longURL;
+  //     }
+  //   }
+  //   return analytics;
+  // };
+  console.log('userUrls:', userURLs);
 
   // if user is logged in, pass data with users object
   const templateVars = {
