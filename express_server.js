@@ -24,14 +24,21 @@ const urlDatabase = {
     userID: 'test',
     uniqueVisits: 13,
     totalVisits: 22,
-    recentVisits: [ { 'timestamp': '2022-07-17T21:13:22.608Z', 'ip': '::ffff:10.0.2.2' } ]
+    recentVisits: [ { 'timestamp': '2022-07-17T21:13:22.608Z', 'ip': '104.31.2.164' } ]
   },
   'efgh': {
     longURL: 'https://www.google.com/',
     userID: 'test',
     uniqueVisits: 230,
     totalVisits: 950,
-    recentVisits: [ { 'timestamp': new Date('2022-07-17T21:13:22.608Z'), 'ip': '::ffff:10.0.2.2' }, {'timestamp': new Date('2022-07-17T21:23:06.150Z'), 'ip': '::ffff:10.0.2.2'} ]
+    recentVisits: [ { 'timestamp': new Date('2022-07-17T21:13:22.608Z'), 'ip': '171.123.159.25' }, {'timestamp': new Date('2022-07-17T21:23:06.150Z'), 'ip': '217.238.248.228'} ]
+  },
+  'ijkl': {
+    longURL: 'https://github.com/',
+    userID: 'test',
+    uniqueVisits: 67,
+    totalVisits: 245,
+    recentVisits: [ { 'timestamp': new Date('2022-06-03T11:13:22.608Z'), 'ip': '107.77.194.36' }, {'timestamp': new Date('2022-07-17T21:23:06.150Z'), 'ip': '71.239.213.177'} ]
   }
 };
 
