@@ -32,21 +32,19 @@
             </tr>
           </thead>
           <tbody>
-            <% console.log(urls) %>
-
-            <% for (let item in urls) { %>
+            <% for (let url in urls) { %>
               <tr>
-                <td><%= item.id %></td>
-                <td><%= item.longURL %></td>
-                <td><%= item.visits %></td>
+                <td><%= urls[url].id %></td>
+                <td><%= urls[url].longURL %></td>
+                <td><%= urls[url].visits %></td>
                 <td>
-                  <form action="/urls/<%= item.id %>" method="GET">
+                  <form action="/urls/<%= urls[url].id %>" method="GET">
                     <button type="submit" id="edit" class="btn btn-outline-primary">Edit</button>
                   </form>
                 </td>
                 <td>
-                  <form action="/urls/<%= item.id %>?_method=DELETE" method="POST">
-                    <input type="hidden" name="delete" value="<%= item.id %>" />
+                  <form action="/urls/<%= urls[url].id %>?_method=DELETE" method="POST">
+                    <input type="hidden" name="delete" value="<%= urls[url].id %>" />
                     <button type="submit" id="delete" class="btn btn-outline-danger">Delete</button>
                   </form>
                 </td>

@@ -79,7 +79,6 @@ app.get('/u/:id',(req, res) => {
 
   // increment the visits for the shortURL
   urlDatabase[id].visits++;
-  console.log('GET - /u/id - short id visits:', urlDatabase[req.params.id].visits);
 
   // if it does, sent user to long URL
   return res.redirect(urlFound.longURL);
@@ -245,7 +244,7 @@ app.post('/urls', (req, res) => {
     userID: req.session.userID,
     visits: 0
   };
-  console.log('url Databse from POST /urls:', urlDatabase);
+
   // redirect to new shortURL page
   return res.redirect('/urls');
 });
