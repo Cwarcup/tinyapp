@@ -30,15 +30,14 @@ const urlsForUser = (id, urlDatabase) => {
   const userUrls = {};
   for (let shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === id) {
-      return userUrls[shortURL] = {
+      userUrls[shortURL] = {
         'id': shortURL,
         'longURL': urlDatabase[shortURL].longURL,
         'visits': urlDatabase[shortURL].visits,
       };
-
     }
   }
-  return {};
+  return userUrls;
 };
 
 module.exports = { generateRandomString, getUserByEmail, checkCookie, urlsForUser };

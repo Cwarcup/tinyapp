@@ -143,7 +143,7 @@ app.get('/urls', (req, res) => {
     return res.status(401).render('urls_notFound', templateVars);
   }
   
-
+  console.log('GET - /urls - user urls:', userURLs);
   // if user is logged in, pass data with users object
   const templateVars = {
     urls: userURLs,
