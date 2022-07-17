@@ -74,11 +74,11 @@ app.get('/u/:id',(req, res) => {
   // create a cookie for a unique id / shortURL
   if (!req.session.id) {
     req.session.id = id;
-    urlDatabase[id].visits++;
+    urlDatabase[id].uniqueVisits++;
   }
 
-  // increment the visits for the shortURL
-  urlDatabase[id].visits++;
+  // increment the uniqueVisits for the shortURL
+  // urlDatabase[id].uniqueVisits++;
 
   // if it does, sent user to long URL
   return res.redirect(urlFound.longURL);
@@ -242,7 +242,7 @@ app.post('/urls', (req, res) => {
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
     userID: req.session.userID,
-    visits: 0
+    uniqueVisits: 0
   };
 
   // redirect to new shortURL page

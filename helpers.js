@@ -33,7 +33,7 @@ const urlsForUser = (id, urlDatabase) => {
       userUrls[shortURL] = {
         'id': shortURL,
         'longURL': urlDatabase[shortURL].longURL,
-        'visits': urlDatabase[shortURL].visits,
+        'uniqueVisits': urlDatabase[shortURL].uniqueVisits,
       };
     }
   }

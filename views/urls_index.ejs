@@ -36,7 +36,7 @@
               <tr>
                 <td><%= urls[url].id %></td>
                 <td><%= urls[url].longURL %></td>
-                <td><%= urls[url].visits %></td>
+                <td><%= urls[url].uniqueVisits %></td>
                 <td>
                   <form action="/urls/<%= urls[url].id %>" method="GET">
                     <button type="submit" id="edit" class="btn btn-outline-primary">Edit</button>
