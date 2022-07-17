@@ -30,8 +30,8 @@ const urlsForUser = (id, urlDatabase) => {
   const userUrls = {};
   for (let shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === id) {
-      userUrls[shortURL] = urlDatabase[shortURL].longURL;
-      userUrls['visits'] = urlDatabase[shortURL].visits;
+      userUrls[shortURL].longURL = urlDatabase[shortURL].longURL;
+      userUrls[shortURL].visits = urlDatabase[shortURL].visits;
     }
   }
   return userUrls;
