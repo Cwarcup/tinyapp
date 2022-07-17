@@ -18,9 +18,23 @@ app.use(cookieSession({
 }));
 app.use(methodOverride('_method'));
 
-const urlDatabase = {};
+const urlDatabase = {
+  'frwmsg': {
+    longURL: 'https://stackoverflow.com/questions/2281087/center-a-div-in-css',
+    userID: 'pczzd',
+    uniqueVisits: 13,
+    totalVisits: 22,
+    recentVisits: [ { 'timestamp': '2022-07-17T21:13:22.608Z', 'ip': '::ffff:10.0.2.2' } ]
+  }
+};
 
-const users = {};
+const users = {
+  'pczzd': {
+    id: 'pczzd',
+    email: 'test@email.com',
+    password: '$2a$10$EJxCbYwb/Q0dQzGRPOWBP.oKzgpqvvWE3jWTrKo0h2tY72ht.K0ry'
+  }
+};
 
 const { generateRandomString, getUserByEmail, checkCookie, urlsForUser } = require('./helpers');
 
@@ -79,9 +93,18 @@ app.get('/u/:id',(req, res) => {
 
   // increment the totalVisits for the in UrlDatabase
   urlDatabase[id].totalVisits++;
-  
 
-  // if it does, sent user to long URL
+  // !! add timestamp to the UrlDatabase timestamp object
+  const userAccessed = {
+    timestamp: new Date(),
+    ip: req.ip
+  };
+  urlDatabase[id].recentVisits.push(userAccessed);
+  
+  console.log('url database after new entry', urlDatabase);
+  console.log('recent visits: ', urlDatabase[id].recentVisits);
+
+  //  if it does, sent user to long URL
   return res.redirect(urlFound.longURL);
 });
 
@@ -195,6 +218,7 @@ app.post('/register', (req, res) => {
     email: req.body.email,
     password: hashedPassword
   };
+  console.log('hashed password: ', hashedPassword);
   // add newUser to users database
   users[newUser.id] = newUser;
   // set cookie for new user using newUser.id
@@ -244,7 +268,8 @@ app.post('/urls', (req, res) => {
     longURL: req.body.longURL,
     userID: req.session.userID,
     uniqueVisits: 0,
-    totalVisits: 0
+    totalVisits: 0,
+    recentVisits: []
   };
 
   // redirect to new shortURL page
