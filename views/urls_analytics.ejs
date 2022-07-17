@@ -21,21 +21,22 @@
         <p class="card-text">
           Short URL ID: <a href="/u/<%= urls.id %>"><%= urls.id %></a>
         </p>
-        
-        <div class="row">
-          <div class="col">
-            <h5>Visits</h5>
-            <p>
-              <%= urls.totalVisits %>
-            </p>
-          </div>
-          <div class="col">
-            <h5>Unique Visitors</h5>
-            <p>
-              <%= urls.uniqueVisits %>
-            </p>
-          </div>
-        </div>
+        <table class="table">
+          <h5>Visitor Stats</h5>
+          <thead>
+            <tr>
+              <th scope="col"> Total Visits</th>
+              <th scope="col">Unique Visitors</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <th scope="row"><%= urls.totalVisits %></th>
+                <th scope="row"><%= urls.uniqueVisits %></th>
+              </tr>
+          </tbody>
+        </table>
+      
         <table class="table">
           <h5>Recent Visitors</h5>
           <thead>
