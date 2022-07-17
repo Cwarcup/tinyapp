@@ -126,7 +126,7 @@ app.get('/urls/:id', (req, res) => {
 
   const templateVars = {
     id: id,
-    longURL: userUrls[req.params.id],
+    longURL: userUrls[req.params.id].longURL,
     email: users[userID].email
   };
   return res.render('urls_show', templateVars);
